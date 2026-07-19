@@ -3,412 +3,486 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚽ OKESTREAM TV - I7ZX EDITION</title>
+    <title>CYBER CHAT - I7ZX EDITION</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a1a;
-            color: white;
+            font-family: 'Orbitron', monospace;
+            background: #0a0a0f;
+            color: #00ffcc;
             min-height: 100vh;
-        }
-        .header {
-            background: linear-gradient(135deg, #1a1a3e, #2d1b69);
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid #e94560;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .header h1 {
-            font-size: 2rem;
-            background: linear-gradient(45deg, #e94560, #f1c40f);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .header p {
-            color: #aaa;
-            margin-top: 5px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 25px;
-            background: #1a1a2e;
-            padding: 15px 20px;
-            border-radius: 12px;
-        }
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            padding: 12px 20px;
-            border-radius: 30px;
-            border: 2px solid #2d1b69;
-            background: #0a0a1a;
-            color: white;
-            font-size: 1rem;
-        }
-        .search-box:focus {
-            outline: none;
-            border-color: #e94560;
-        }
-        .btn-refresh {
-            padding: 12px 25px;
-            background: #e94560;
-            border: none;
-            border-radius: 30px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-refresh:hover {
-            transform: scale(1.05);
-            background: #ff6b81;
-        }
-        .match-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .match-card {
-            background: linear-gradient(145deg, #1a1a2e, #16213e);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s;
-            border: 1px solid #2d1b69;
-            cursor: pointer;
-        }
-        .match-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
-            border-color: #e94560;
-        }
-        .match-card .live-badge {
-            background: #e94560;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .match-card .card-header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #2d1b69;
-        }
-        .match-card .card-body {
-            padding: 20px;
-        }
-        .match-card .title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-        .match-card .league {
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-        .match-card .time {
-            color: #f1c40f;
-            font-size: 0.9rem;
-        }
-        .match-card .watch-btn {
-            width: 100%;
-            padding: 12px;
-            background: #e94560;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 15px;
-        }
-        .match-card .watch-btn:hover {
-            background: #ff6b81;
-        }
-        .loading {
-            text-align: center;
-            padding: 50px;
-            font-size: 1.5rem;
-        }
-        .loading .spinner {
-            display: inline-block;
-            width: 50px;
-            height: 50px;
-            border: 4px solid #2d1b69;
-            border-top: 4px solid #e94560;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Modal Player */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(5px);
-        }
-        .modal.active {
             display: flex;
             justify-content: center;
             align-items: center;
+            background-image: 
+                radial-gradient(ellipse at 10% 20%, rgba(0, 255, 204, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(255, 0, 128, 0.05) 0%, transparent 50%);
         }
-        .modal-content {
-            background: #1a1a2e;
-            border-radius: 16px;
-            max-width: 1000px;
-            width: 95%;
-            max-height: 90vh;
-            overflow: hidden;
-            position: relative;
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
         }
-        .modal-header {
+        
+        .cyber-card {
+            background: rgba(10, 10, 20, 0.9);
+            border: 2px solid #00ffcc;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.15), inset 0 0 40px rgba(0, 255, 204, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .cyber-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #00ffcc;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.5), 0 0 60px rgba(0, 255, 204, 0.2);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+        
+        .cyber-subtitle {
+            text-align: center;
+            color: #66ffdd;
+            font-size: 0.8rem;
+            letter-spacing: 6px;
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+        
+        /* ===== CAPTCHA SECTION ===== */
+        #verifySection {
+            display: block;
+        }
+        
+        #chatSection {
+            display: none;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #66ffdd;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .cyber-input {
+            width: 100%;
             padding: 15px 20px;
+            background: rgba(0, 255, 204, 0.05);
+            border: 2px solid #00ffcc;
+            border-radius: 12px;
+            color: #00ffcc;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .cyber-input:focus {
+            outline: none;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
+            background: rgba(0, 255, 204, 0.1);
+        }
+        
+        .cyber-input::placeholder {
+            color: rgba(0, 255, 204, 0.3);
+        }
+        
+        .captcha-box {
+            background: rgba(0, 255, 204, 0.05);
+            border: 2px dashed #00ffcc;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .captcha-box .question {
+            font-size: 2rem;
+            color: #00ffcc;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+        }
+        
+        .cyber-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00ffcc, #00cc99);
+            border: none;
+            border-radius: 12px;
+            color: #0a0a0f;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .cyber-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.4);
+        }
+        
+        .cyber-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* ===== CHAT SECTION ===== */
+        .chat-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #2d1b69;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+            margin-bottom: 20px;
         }
-        .modal-close {
+        
+        .chat-user {
+            color: #66ffdd;
+            font-size: 0.8rem;
+        }
+        
+        .chat-user span {
+            color: #00ffcc;
+            font-weight: 700;
+        }
+        
+        .chat-logout {
             background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
+            border: 2px solid #ff0044;
+            color: #ff0044;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-family: 'Orbitron', monospace;
             cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.7rem;
         }
-        .modal-body {
-            padding: 20px;
+        
+        .chat-logout:hover {
+            background: #ff0044;
+            color: #0a0a0f;
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.3);
         }
-        .modal-body video, .modal-body iframe {
-            width: 100%;
-            height: 500px;
-            border-radius: 8px;
-            background: #000;
+        
+        #messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0, 255, 204, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 204, 0.1);
+            margin-bottom: 15px;
         }
-        .modal-body .info {
-            margin-top: 15px;
-            padding: 15px;
-            background: #0a0a1a;
-            border-radius: 8px;
+        
+        #messages::-webkit-scrollbar {
+            width: 6px;
         }
-        .no-matches {
+        
+        #messages::-webkit-scrollbar-track {
+            background: rgba(0, 255, 204, 0.05);
+        }
+        
+        #messages::-webkit-scrollbar-thumb {
+            background: #00ffcc;
+            border-radius: 10px;
+        }
+        
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: rgba(0, 255, 204, 0.05);
+            border-left: 3px solid #00ffcc;
+            border-radius: 6px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message .msg-user {
+            color: #ff66cc;
+            font-weight: 700;
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+        
+        .message .msg-text {
+            color: #ccffdd;
+            font-size: 0.9rem;
+        }
+        
+        .message .msg-time {
+            color: rgba(0, 255, 204, 0.3);
+            font-size: 0.6rem;
+            float: right;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input-area .cyber-input {
+            flex: 1;
+        }
+        
+        .chat-input-area .cyber-btn {
+            width: auto;
+            padding: 15px 30px;
+            font-size: 0.8rem;
+        }
+        
+        .empty-chat {
             text-align: center;
-            padding: 50px;
-            color: #666;
-            font-size: 1.2rem;
+            color: rgba(0, 255, 204, 0.3);
+            padding: 50px 0;
+            font-size: 0.9rem;
+        }
+        
+        .error {
+            color: #ff0044;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ff0044;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>⚽ OKESTREAM TV - I7ZX EDITION</h1>
-    <p>Streaming pertandingan langsung tanpa iklan 🔥</p>
-</div>
-
 <div class="container">
-    <div class="controls">
-        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Cari pertandingan...">
-        <button class="btn-refresh" onclick="loadMatches()">🔄 Refresh</button>
-        <span id="matchCount" style="color: #aaa;">0 pertandingan</span>
-    </div>
-
-    <div id="matchContainer">
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>🔍 Memuat daftar pertandingan...</p>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Player -->
-<div class="modal" id="playerModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modalTitle">Pertandingan</h3>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div id="playerContainer">
-                <p style="text-align:center; color:#666;">Memuat stream...</p>
+    <div class="cyber-card">
+        <div class="cyber-title">CYBER CHAT</div>
+        <div class="cyber-subtitle">⚡ SECURE • ANONYMOUS • EPHEMERAL ⚡</div>
+        
+        <!-- ERROR MESSAGE -->
+        <div id="errorMsg" class="error"></div>
+        
+        <!-- ===== VERIFIKASI SECTION ===== -->
+        <div id="verifySection">
+            <div class="input-group">
+                <label>👤 Username Telegram</label>
+                <input type="text" id="telegramUsername" class="cyber-input" placeholder="Masukkan username Telegrammu..." required>
             </div>
-            <div class="info" id="matchInfo">
-                <p><strong>Liga:</strong> <span id="modalLeague">-</span></p>
-                <p><strong>Waktu:</strong> <span id="modalTime">-</span></p>
+            
+            <div class="input-group">
+                <label>🔐 Verifikasi Captcha</label>
+                <div class="captcha-box">
+                    <div class="question" id="captchaQuestion">Loading...</div>
+                </div>
+                <input type="text" id="captchaAnswer" class="cyber-input" placeholder="Masukkan hasil penjumlahan..." required>
+                <input type="hidden" id="captchaId">
+                <button class="cyber-btn" onclick="verifyCaptcha()" style="margin-top:10px;">🚀 VERIFIKASI</button>
             </div>
         </div>
+        
+        <!-- ===== CHAT SECTION ===== -->
+        <div id="chatSection">
+            <div class="chat-header">
+                <div class="chat-user">👤 <span id="currentUser">-</span></div>
+                <button class="chat-logout" onclick="logout()">⛔ KELUAR</button>
+            </div>
+            
+            <div id="messages">
+                <div class="empty-chat">💬 Belum ada pesan. Mulai chatting!</div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="cyber-input" placeholder="Ketik pesan..." maxlength="500">
+                <button class="cyber-btn" onclick="sendMessage()">➤ KIRIM</button>
+            </div>
+        </div>
+        
     </div>
 </div>
 
 <script>
-    let allMatches = [];
-
-    // ===== LOAD MATCHES =====
-    async function loadMatches() {
-        const container = document.getElementById('matchContainer');
-        container.innerHTML = `
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>🔍 Memuat daftar pertandingan...</p>
-            </div>
-        `;
-
+    let captchaInterval = null;
+    
+    // ===== AMBIL CAPTCHA =====
+    async function loadCaptcha() {
         try {
-            const response = await fetch('/api/matches');
-            const data = await response.json();
-            
-            if (data.success) {
-                allMatches = data.matches;
-                renderMatches(allMatches);
-                document.getElementById('matchCount').textContent = `${allMatches.length} pertandingan`;
-            } else {
-                container.innerHTML = `<div class="no-matches">❌ Gagal memuat data: ${data.error}</div>`;
-            }
+            const res = await fetch('/api/captcha');
+            const data = await res.json();
+            document.getElementById('captchaQuestion').textContent = data.question;
+            document.getElementById('captchaId').value = data.captchaId;
+            document.getElementById('captchaAnswer').value = '';
+            document.getElementById('errorMsg').style.display = 'none';
         } catch (error) {
-            container.innerHTML = `<div class="no-matches">❌ Error: ${error.message}</div>`;
+            document.getElementById('captchaQuestion').textContent = '❌ Error load captcha';
         }
     }
-
-    // ===== RENDER MATCHES =====
-    function renderMatches(matches) {
-        const container = document.getElementById('matchContainer');
+    
+    // ===== VERIFIKASI CAPTCHA + USERNAME =====
+    async function verifyCaptcha() {
+        const username = document.getElementById('telegramUsername').value.trim();
+        const answer = document.getElementById('captchaAnswer').value.trim();
+        const captchaId = document.getElementById('captchaId').value;
         
-        if (matches.length === 0) {
-            container.innerHTML = `<div class="no-matches">😴 Tidak ada pertandingan saat ini</div>`;
+        if (!username || !answer) {
+            showError('Username dan captcha wajib diisi!');
             return;
         }
-
-        let html = '<div class="match-grid">';
-        matches.forEach(match => {
+        
+        try {
+            const res = await fetch('/api/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ telegramUsername: username, answer, captchaId })
+            });
+            
+            const data = await res.json();
+            
+            if (data.success) {
+                // SUKSES! Pindah ke chat
+                document.getElementById('verifySection').style.display = 'none';
+                document.getElementById('chatSection').style.display = 'block';
+                document.getElementById('currentUser').textContent = username;
+                loadMessages();
+                startAutoRefresh();
+            } else {
+                showError(data.error || 'Verifikasi gagal!');
+                loadCaptcha(); // Refresh captcha
+            }
+        } catch (error) {
+            showError('Error: ' + error.message);
+        }
+    }
+    
+    // ===== KIRIM PESAN =====
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        if (message.length > 500) {
+            showError('Pesan maksimal 500 karakter!');
+            return;
+        }
+        
+        try {
+            const res = await fetch('/api/chat/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            
+            if (!res.ok) {
+                const data = await res.json();
+                if (res.status === 401) {
+                    // Session expired, logout
+                    alert('Session expired. Verifikasi ulang.');
+                    logout();
+                    return;
+                }
+                throw new Error(data.error || 'Gagal kirim pesan');
+            }
+            
+            input.value = '';
+            loadMessages();
+        } catch (error) {
+            showError('Error: ' + error.message);
+        }
+    }
+    
+    // ===== AMBIL PESAN =====
+    async function loadMessages() {
+        try {
+            const res = await fetch('/api/chat/messages');
+            
+            if (!res.ok) {
+                if (res.status === 401) {
+                    logout();
+                    return;
+                }
+                throw new Error('Gagal ambil pesan');
+            }
+            
+            const data = await res.json();
+            renderMessages(data.messages);
+        } catch (error) {
+            console.error('Load messages error:', error);
+        }
+    }
+    
+    // ===== RENDER PESAN =====
+    function renderMessages(messages) {
+        const container = document.getElementById('messages');
+        
+        if (!messages || messages.length === 0) {
+            container.innerHTML = '<div class="empty-chat">💬 Belum ada pesan. Mulai chatting!</div>';
+            return;
+        }
+        
+        let html = '';
+        messages.forEach(msg => {
+            const time = new Date(msg.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             html += `
-                <div class="match-card" onclick="openMatch('${match.id}')">
-                    <div class="card-header">
-                        <span class="live-badge">🔴 LIVE</span>
-                        <span class="time">${match.time || 'LIVE'}</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="title">${match.title}</div>
-                        <div class="league">🏆 ${match.league || 'Liga Unknown'}</div>
-                        ${match.m3u8Link ? '<div style="color:#2ecc71; font-size:0.8rem; margin-top:5px;">✅ Stream tersedia</div>' : '<div style="color:#e74c3c; font-size:0.8rem; margin-top:5px;">⚠️ Stream tidak tersedia</div>'}
-                        <button class="watch-btn">▶️ Tonton Sekarang</button>
-                    </div>
+                <div class="message">
+                    <div class="msg-user">${msg.username}</div>
+                    <div class="msg-text">${msg.message}</div>
+                    <div class="msg-time">${time}</div>
                 </div>
             `;
         });
-        html += '</div>';
+        
         container.innerHTML = html;
+        container.scrollTop = container.scrollHeight;
     }
-
-    // ===== SEARCH =====
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        const query = e.target.value.toLowerCase();
-        const filtered = allMatches.filter(m => 
-            m.title.toLowerCase().includes(query) || 
-            (m.league && m.league.toLowerCase().includes(query))
-        );
-        renderMatches(filtered);
-        document.getElementById('matchCount').textContent = `${filtered.length} pertandingan`;
-    });
-
-    // ===== OPEN MATCH =====
-    async function openMatch(matchId) {
-        const modal = document.getElementById('playerModal');
-        const container = document.getElementById('playerContainer');
-        const title = document.getElementById('modalTitle');
-        const league = document.getElementById('modalLeague');
-        const time = document.getElementById('modalTime');
-
-        try {
-            const response = await fetch(`/api/match/${matchId}`);
-            const data = await response.json();
-            
-            if (data.success) {
-                const match = data.match;
-                title.textContent = match.title;
-                league.textContent = match.league || 'Liga Unknown';
-                time.textContent = match.time || 'LIVE';
-
-                // Tampilkan player
-                if (match.m3u8Link) {
-                    container.innerHTML = `
-                        <video id="videoPlayer" controls autoplay>
-                            <source src="${match.m3u8Link}" type="application/vnd.apple.mpegurl">
-                            Browser Anda tidak mendukung video.
-                        </video>
-                        <p style="color:#aaa; font-size:0.8rem; margin-top:8px;">
-                            🔗 ${match.m3u8Link}
-                        </p>
-                    `;
-                    
-                    // Coba play pake HLS.js (kalo browser support)
-                    if (Hls && Hls.isSupported()) {
-                        const video = document.getElementById('videoPlayer');
-                        const hls = new Hls();
-                        hls.loadSource(match.m3u8Link);
-                        hls.attachMedia(video);
-                        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-                    }
-                } else if (match.streamLink) {
-                    container.innerHTML = `
-                        <iframe src="${match.streamLink}" allowfullscreen></iframe>
-                    `;
-                } else {
-                    container.innerHTML = `<p style="color:#e74c3c;">❌ Link streaming tidak tersedia untuk pertandingan ini.</p>`;
-                }
-
-                modal.classList.add('active');
+    
+    // ===== LOGOUT =====
+    async function logout() {
+        await fetch('/api/logout', { method: 'POST' });
+        document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        location.reload();
+    }
+    
+    // ===== AUTO REFRESH PESAN =====
+    function startAutoRefresh() {
+        if (captchaInterval) clearInterval(captchaInterval);
+        captchaInterval = setInterval(loadMessages, 5000); // Refresh tiap 5 detik
+    }
+    
+    // ===== SHOW ERROR =====
+    function showError(msg) {
+        const el = document.getElementById('errorMsg');
+        el.textContent = msg;
+        el.style.display = 'block';
+        setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+    
+    // ===== ENTER KEY =====
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            if (document.getElementById('chatSection').style.display === 'block') {
+                sendMessage();
+            } else {
+                verifyCaptcha();
             }
-        } catch (error) {
-            container.innerHTML = `<p style="color:#e74c3c;">❌ Error: ${error.message}</p>`;
         }
-    }
-
-    // ===== CLOSE MODAL =====
-    function closeModal() {
-        document.getElementById('playerModal').classList.remove('active');
-        const video = document.getElementById('videoPlayer');
-        if (video) video.pause();
-        document.getElementById('playerContainer').innerHTML = '<p style="text-align:center; color:#666;">Memuat stream...</p>';
-    }
-
-    // ===== LOAD ON START =====
-    loadMatches();
-
-    // Auto refresh tiap 60 detik
-    setInterval(loadMatches, 60000);
-
-    // HLS.js CDN (kalo perlu)
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-    document.head.appendChild(script);
+    });
+    
+    // ===== INIT =====
+    loadCaptcha();
 </script>
-
 </body>
-  </html>
+    </html>
