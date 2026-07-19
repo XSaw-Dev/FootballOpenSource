@@ -56,14 +56,8 @@
             margin-bottom: 30px;
         }
         
-        /* ===== CAPTCHA SECTION ===== */
-        #verifySection {
-            display: block;
-        }
-        
-        #chatSection {
-            display: none;
-        }
+        #verifySection { display: block; }
+        #chatSection { display: none; }
         
         .input-group {
             margin-bottom: 20px;
@@ -141,7 +135,6 @@
             cursor: not-allowed;
         }
         
-        /* ===== CHAT SECTION ===== */
         .chat-header {
             display: flex;
             justify-content: space-between;
@@ -265,6 +258,17 @@
             margin-bottom: 15px;
             display: none;
         }
+        
+        .status-online {
+            color: #00ffcc;
+            font-size: 0.7rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
     </style>
 </head>
 <body>
@@ -274,10 +278,9 @@
         <div class="cyber-title">CYBER CHAT</div>
         <div class="cyber-subtitle">⚡ SECURE • ANONYMOUS • EPHEMERAL ⚡</div>
         
-        <!-- ERROR MESSAGE -->
         <div id="errorMsg" class="error"></div>
         
-        <!-- ===== VERIFIKASI SECTION ===== -->
+        <!-- ===== VERIFIKASI ===== -->
         <div id="verifySection">
             <div class="input-group">
                 <label>👤 Username Telegram</label>
@@ -295,10 +298,13 @@
             </div>
         </div>
         
-        <!-- ===== CHAT SECTION ===== -->
+        <!-- ===== CHAT ===== -->
         <div id="chatSection">
             <div class="chat-header">
-                <div class="chat-user">👤 <span id="currentUser">-</span></div>
+                <div>
+                    <div class="chat-user">👤 <span id="currentUser">-</span></div>
+                    <div class="status-online">● ONLINE</div>
+                </div>
                 <button class="chat-logout" onclick="logout()">⛔ KELUAR</button>
             </div>
             
@@ -316,23 +322,25 @@
 </div>
 
 <script>
-    let captchaInterval = null;
+    let refreshInterval = null;
     
     // ===== AMBIL CAPTCHA =====
     async function loadCaptcha() {
         try {
             const res = await fetch('/api/captcha');
             const data = await res.json();
-            document.getElementById('captchaQuestion').textContent = data.question;
-            document.getElementById('captchaId').value = data.captchaId;
-            document.getElementById('captchaAnswer').value = '';
-            document.getElementById('errorMsg').style.display = 'none';
+            if (data.success) {
+                document.getElementById('captchaQuestion').textContent = data.question;
+                document.getElementById('captchaId').value = data.captchaId;
+                document.getElementById('captchaAnswer').value = '';
+                hideError();
+            }
         } catch (error) {
             document.getElementById('captchaQuestion').textContent = '❌ Error load captcha';
         }
     }
     
-    // ===== VERIFIKASI CAPTCHA + USERNAME =====
+    // ===== VERIFIKASI =====
     async function verifyCaptcha() {
         const username = document.getElementById('telegramUsername').value.trim();
         const answer = document.getElementById('captchaAnswer').value.trim();
@@ -353,7 +361,6 @@
             const data = await res.json();
             
             if (data.success) {
-                // SUKSES! Pindah ke chat
                 document.getElementById('verifySection').style.display = 'none';
                 document.getElementById('chatSection').style.display = 'block';
                 document.getElementById('currentUser').textContent = username;
@@ -361,7 +368,7 @@
                 startAutoRefresh();
             } else {
                 showError(data.error || 'Verifikasi gagal!');
-                loadCaptcha(); // Refresh captcha
+                loadCaptcha();
             }
         } catch (error) {
             showError('Error: ' + error.message);
@@ -389,7 +396,6 @@
             if (!res.ok) {
                 const data = await res.json();
                 if (res.status === 401) {
-                    // Session expired, logout
                     alert('Session expired. Verifikasi ulang.');
                     logout();
                     return;
@@ -456,18 +462,22 @@
         location.reload();
     }
     
-    // ===== AUTO REFRESH PESAN =====
+    // ===== AUTO REFRESH =====
     function startAutoRefresh() {
-        if (captchaInterval) clearInterval(captchaInterval);
-        captchaInterval = setInterval(loadMessages, 5000); // Refresh tiap 5 detik
+        if (refreshInterval) clearInterval(refreshInterval);
+        refreshInterval = setInterval(loadMessages, 5000);
     }
     
-    // ===== SHOW ERROR =====
+    // ===== ERROR HANDLING =====
     function showError(msg) {
         const el = document.getElementById('errorMsg');
         el.textContent = msg;
         el.style.display = 'block';
         setTimeout(() => { el.style.display = 'none'; }, 5000);
+    }
+    
+    function hideError() {
+        document.getElementById('errorMsg').style.display = 'none';
     }
     
     // ===== ENTER KEY =====
