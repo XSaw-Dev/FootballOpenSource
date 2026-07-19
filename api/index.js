@@ -42,22 +42,36 @@ function getDeveloperData() {
   }
 }
 
+// ===== GET REAL IP (MULTI-LAYER) =====
+function getRealIP(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+         req.headers['x-real-ip'] ||
+         req.headers['cf-connecting-ip'] ||  // Cloudflare
+         req.headers['true-client-ip'] ||
+         req.ip ||
+         req.connection?.remoteAddress ||
+         '0.0.0.0';
+}
+
 // ================================================================
-// 1. BAN SYSTEM + AUTO REDIRECT
+// 1. BAN SYSTEM + AUTO REDIRECT (TAPI CAPTCHA TETEP KELIHATAN)
 // ================================================================
 
-// ===== MIDDLEWARE BAN REDIRECT =====
-async function banRedirect(req, res, next) {
-  const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+// ===== MIDDLEWARE BAN CHECK (TAPI TETEP BISA AKSES CAPTCHA) =====
+async function checkBan(req, res, next) {
+  const ip = getRealIP(req);
   
-  // Cek di Redis
+  // Kalo request ke /ban.html atau file static, skip
+  if (req.path === '/ban.html' || req.path.startsWith('/_next/') || req.path.startsWith('/static/')) {
+    return next();
+  }
+  
   const redisBan = await redis.get(`ban:${ip}`);
   if (redisBan) {
     const banData = JSON.parse(redisBan);
     const attempts = await redis.get(`ip:${ip}`);
     const attemptData = attempts ? JSON.parse(attempts) : { attempts: 0 };
     
-    // Hitung risk
     let risk = Math.min(20 + (attemptData.attempts || 0) * 12, 95);
     if (banData.reason && banData.reason.includes('admin')) risk = 90;
     
@@ -72,18 +86,20 @@ async function banRedirect(req, res, next) {
       });
     }
     
-    // Kalo request HTML, redirect
-    return res.redirect(redirectUrl);
+    // Kalo request HTML (bukan ban.html), redirect
+    if (!req.path.includes('ban.html')) {
+      return res.redirect(redirectUrl);
+    }
   }
   
   next();
 }
 
-// PAKAI MIDDLEWARE INI SEBELUM ROUTE LAIN
-app.use(banRedirect);
+// PAKAI MIDDLEWARE INI
+app.use(checkBan);
 
 // ================================================================
-// 2. GENERATE SESSION SIGNATURE (TANPA SECRET KEY)
+// 2. GENERATE SESSION SIGNATURE
 // ================================================================
 
 function generateSessionSignature(username, ip, userAgent, timestamp) {
@@ -92,7 +108,7 @@ function generateSessionSignature(username, ip, userAgent, timestamp) {
 }
 
 // ================================================================
-// 3. MIDDLEWARE CEK SESSION (DIPERKETAT)
+// 3. MIDDLEWARE CEK SESSION
 // ================================================================
 
 async function checkSession(req, res, next) {
@@ -109,34 +125,19 @@ async function checkSession(req, res, next) {
     }
     
     const session = JSON.parse(sessionData);
-    const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+    const ip = getRealIP(req);
     const userAgent = req.headers['user-agent'] || '';
     
-    // VALIDASI 1: IP harus sama dengan saat login
     if (session.ip && session.ip !== ip) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'IP_MISMATCH', message: 'IP berbeda dengan session.' });
+      return res.status(401).json({ error: 'IP_MISMATCH' });
     }
     
-    // VALIDASI 2: User-Agent harus sama
     if (session.userAgent && session.userAgent !== userAgent) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'DEVICE_MISMATCH', message: 'Device berbeda.' });
-    }
-    
-    // VALIDASI 3: Signature harus valid
-    const expectedSignature = generateSessionSignature(
-      session.username,
-      session.ip,
-      session.userAgent,
-      session.timestamp
-    );
-    if (session.signature !== expectedSignature) {
-      await redis.del(`session:${sessionId}`);
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'INVALID_SIGNATURE', message: 'Signature tidak valid.' });
+      return res.status(401).json({ error: 'DEVICE_MISMATCH' });
     }
     
     req.session = session;
@@ -147,7 +148,7 @@ async function checkSession(req, res, next) {
 }
 
 // ================================================================
-// 4. MIDDLEWARE CEK DEVELOPER (DIPERKETAT)
+// 4. MIDDLEWARE CEK DEVELOPER
 // ================================================================
 
 async function checkDeveloper(req, res, next) {
@@ -165,39 +166,17 @@ async function checkDeveloper(req, res, next) {
     
     const session = JSON.parse(sessionData);
     const developer = getDeveloperData();
-    const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+    const ip = getRealIP(req);
     const userAgent = req.headers['user-agent'] || '';
     
-    // VALIDASI DEVELOPER
     if (!session.isDeveloper || session.username !== developer.username) {
       return res.status(403).json({ error: 'Akses ditolak. Hanya untuk developer.' });
     }
     
-    // Validasi IP
     if (session.ip && session.ip !== ip) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
       return res.status(401).json({ error: 'IP_MISMATCH' });
-    }
-    
-    // Validasi User-Agent
-    if (session.userAgent && session.userAgent !== userAgent) {
-      await redis.del(`session:${sessionId}`);
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'DEVICE_MISMATCH' });
-    }
-    
-    // Validasi Signature
-    const expectedSignature = generateSessionSignature(
-      session.username,
-      session.ip,
-      session.userAgent,
-      session.timestamp
-    );
-    if (session.signature !== expectedSignature) {
-      await redis.del(`session:${sessionId}`);
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'INVALID_SIGNATURE' });
     }
     
     req.session = session;
@@ -208,7 +187,7 @@ async function checkDeveloper(req, res, next) {
 }
 
 // ================================================================
-// 5. GENERATE CAPTCHA
+// 5. GENERATE CAPTCHA (TETEP JALAN WALAU IP BAN)
 // ================================================================
 
 app.get('/api/captcha', async (req, res) => {
@@ -239,7 +218,7 @@ app.get('/api/captcha', async (req, res) => {
 // ================================================================
 
 app.post('/api/verify', async (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+  const ip = getRealIP(req);
   const userAgent = req.headers['user-agent'] || '';
   
   try {
@@ -305,7 +284,6 @@ app.post('/api/verify', async (req, res) => {
     const developer = getDeveloperData();
     const isDeveloper = telegramUsername.toLowerCase() === developer.username.toLowerCase();
     
-    // Generate signature tanpa secret key
     const signature = generateSessionSignature(telegramUsername, ip, userAgent, timestamp);
     
     const sessionData = {
@@ -344,7 +322,7 @@ app.post('/api/verify', async (req, res) => {
 // ================================================================
 
 app.post('/api/developer-login', async (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+  const ip = getRealIP(req);
   const userAgent = req.headers['user-agent'] || '';
   
   try {
@@ -406,10 +384,9 @@ app.get('/api/check-session', async (req, res) => {
     }
     
     const session = JSON.parse(sessionData);
-    const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+    const ip = getRealIP(req);
     const userAgent = req.headers['user-agent'] || '';
     
-    // Validasi cepat
     if (session.ip && session.ip !== ip) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
@@ -484,7 +461,7 @@ app.get('/api/chat/messages', checkSession, async (req, res) => {
 });
 
 // ================================================================
-// 11. CLEAR MESSAGES (Developer Only)
+// 11. CLEAR MESSAGES
 // ================================================================
 
 app.delete('/api/chat/clear', checkDeveloper, async (req, res) => {
@@ -498,10 +475,9 @@ app.delete('/api/chat/clear', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 12. IP CONTROL (Developer Only)
+// 12. IP CONTROL
 // ================================================================
 
-// GET IP LIST
 app.get('/api/ip-list', checkDeveloper, async (req, res) => {
   try {
     const keys = await redis.keys('ip:*');
@@ -529,7 +505,6 @@ app.get('/api/ip-list', checkDeveloper, async (req, res) => {
   }
 });
 
-// BAN IP
 app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
   try {
     const { ip, reason } = req.body;
@@ -548,7 +523,6 @@ app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
   }
 });
 
-// UNBAN IP
 app.post('/api/unban-ip', checkDeveloper, async (req, res) => {
   try {
     const { ip } = req.body;
@@ -563,7 +537,6 @@ app.post('/api/unban-ip', checkDeveloper, async (req, res) => {
   }
 });
 
-// DELETE IP FROM HISTORY
 app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
   try {
     const { ip } = req.body;
@@ -587,7 +560,7 @@ app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 13. TEST SECURITY (Developer Only)
+// 13. TEST SECURITY
 // ================================================================
 
 app.get('/api/test-security', checkDeveloper, async (req, res) => {
@@ -685,7 +658,7 @@ app.post('/api/logout', async (req, res) => {
 });
 
 // ================================================================
-// 17. TEST REDIS (Opsional)
+// 17. TEST REDIS
 // ================================================================
 
 app.get('/api/ping', async (req, res) => {
