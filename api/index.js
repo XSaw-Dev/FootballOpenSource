@@ -42,48 +42,59 @@ function getDeveloperData() {
   }
 }
 
-// ===== BAN SYSTEM =====
-const bannedIPs = new Map();
-const ipHistory = new Map();
+// ================================================================
+// 1. BAN SYSTEM + AUTO REDIRECT
+// ================================================================
 
-async function checkBan(req, res, next) {
+// ===== MIDDLEWARE BAN REDIRECT =====
+async function banRedirect(req, res, next) {
   const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
   
+  // Cek di Redis
   const redisBan = await redis.get(`ban:${ip}`);
   if (redisBan) {
     const banData = JSON.parse(redisBan);
-    return res.status(403).json({ 
-      error: '⛔ IP Anda diblokir oleh administrator.',
-      bannedAt: banData.bannedAt,
-      reason: banData.reason || 'Diblokir oleh admin'
-    });
+    const attempts = await redis.get(`ip:${ip}`);
+    const attemptData = attempts ? JSON.parse(attempts) : { attempts: 0 };
+    
+    // Hitung risk
+    let risk = Math.min(20 + (attemptData.attempts || 0) * 12, 95);
+    if (banData.reason && banData.reason.includes('admin')) risk = 90;
+    
+    const redirectUrl = `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(banData.reason || 'Diblokir oleh admin')}&attempts=${attemptData.attempts || 0}&risk=${risk}&bannedAt=${encodeURIComponent(banData.bannedAt)}&status=BANNED`;
+    
+    // Kalo request API, kasih JSON
+    if (req.path.startsWith('/api/')) {
+      return res.status(403).json({
+        error: 'BANNED',
+        message: 'IP Anda telah diblokir',
+        redirect: redirectUrl
+      });
+    }
+    
+    // Kalo request HTML, redirect
+    return res.redirect(redirectUrl);
   }
-  
-  if (bannedIPs.has(ip)) {
-    return res.status(403).json({ 
-      error: '⛔ IP Anda diblokir oleh administrator.',
-      bannedAt: bannedIPs.get(ip).bannedAt
-    });
-  }
-  
-  const history = ipHistory.get(ip) || { firstSeen: new Date().toISOString(), attempts: 0 };
-  history.lastSeen = new Date().toISOString();
-  history.attempts += 1;
-  ipHistory.set(ip, history);
-  await redis.setex(`ip:${ip}`, 2592000, JSON.stringify(history));
   
   next();
 }
-app.use(checkBan);
 
-// ===== GENERATE SESSION SIGNATURE (TANPA SECRET KEY) =====
+// PAKAI MIDDLEWARE INI SEBELUM ROUTE LAIN
+app.use(banRedirect);
+
+// ================================================================
+// 2. GENERATE SESSION SIGNATURE (TANPA SECRET KEY)
+// ================================================================
+
 function generateSessionSignature(username, ip, userAgent, timestamp) {
-  // Kombinasi: username + IP + user-agent + timestamp → hash
   const raw = `${username}|${ip}|${userAgent}|${timestamp}`;
   return crypto.createHash('sha256').update(raw).digest('hex');
 }
 
-// ===== MIDDLEWARE CEK SESSION (DIPERKETAT) =====
+// ================================================================
+// 3. MIDDLEWARE CEK SESSION (DIPERKETAT)
+// ================================================================
+
 async function checkSession(req, res, next) {
   try {
     const sessionId = req.cookies.sessionId;
@@ -135,7 +146,10 @@ async function checkSession(req, res, next) {
   }
 }
 
-// ===== MIDDLEWARE CEK DEVELOPER (DOUBLE VALIDATION) =====
+// ================================================================
+// 4. MIDDLEWARE CEK DEVELOPER (DIPERKETAT)
+// ================================================================
+
 async function checkDeveloper(req, res, next) {
   try {
     const sessionId = req.cookies.sessionId;
@@ -193,7 +207,10 @@ async function checkDeveloper(req, res, next) {
   }
 }
 
-// ===== GENERATE CAPTCHA =====
+// ================================================================
+// 5. GENERATE CAPTCHA
+// ================================================================
+
 app.get('/api/captcha', async (req, res) => {
   try {
     const captchaId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
@@ -217,7 +234,10 @@ app.get('/api/captcha', async (req, res) => {
   }
 });
 
-// ===== VERIFIKASI CAPTCHA + USERNAME =====
+// ================================================================
+// 6. VERIFIKASI CAPTCHA + USERNAME (DENGAN AUTO-BAN)
+// ================================================================
+
 app.post('/api/verify', async (req, res) => {
   const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
   const userAgent = req.headers['user-agent'] || '';
@@ -229,9 +249,15 @@ app.post('/api/verify', async (req, res) => {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
     
+    // CEK BAN DULU
     const redisBan = await redis.get(`ban:${ip}`);
     if (redisBan) {
-      return res.status(403).json({ error: '⛔ IP Anda diblokir oleh administrator.' });
+      const banData = JSON.parse(redisBan);
+      return res.status(403).json({ 
+        error: 'BANNED',
+        message: 'IP Anda telah diblokir',
+        redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(banData.reason || 'Diblokir oleh admin')}`
+      });
     }
     
     let verified = false;
@@ -245,23 +271,32 @@ app.post('/api/verify', async (req, res) => {
     }
     
     if (!verified) {
+      // Update attempts
       const history = await redis.get(`ip:${ip}`);
-      if (history) {
-        const data = JSON.parse(history);
-        data.attempts = (data.attempts || 0) + 1;
-        await redis.setex(`ip:${ip}`, 2592000, JSON.stringify(data));
-        
-        if (data.attempts >= 5) {
-          await redis.setex(`ban:${ip}`, 3600, JSON.stringify({
-            bannedAt: new Date().toISOString(),
-            reason: 'Terlalu banyak percobaan gagal (auto-ban)'
-          }));
-          return res.status(429).json({ error: '⛔ IP diblokir sementara 1 jam.' });
-        }
+      let attemptData = history ? JSON.parse(history) : { firstSeen: new Date().toISOString(), attempts: 0 };
+      attemptData.attempts = (attemptData.attempts || 0) + 1;
+      attemptData.lastSeen = new Date().toISOString();
+      
+      await redis.setex(`ip:${ip}`, 2592000, JSON.stringify(attemptData));
+      
+      // AUTO-BAN KALO 5 ATTEMPTS
+      if (attemptData.attempts >= 5) {
+        await redis.setex(`ban:${ip}`, 2592000, JSON.stringify({
+          bannedAt: new Date().toISOString(),
+          reason: 'Terlalu banyak percobaan login gagal (auto-ban)'
+        }));
+        return res.status(429).json({ 
+          error: 'AUTO_BANNED',
+          message: 'IP Anda diblokir otomatis karena terlalu banyak percobaan gagal.',
+          redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=Terlalu banyak percobaan login gagal (auto-ban)&attempts=${attemptData.attempts}&risk=85&bannedAt=${new Date().toISOString()}`
+        });
       }
       
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
+    
+    // Reset attempts kalo berhasil
+    await redis.del(`ip:${ip}`);
     
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
     const expiresIn = 7 * 24 * 3600;
@@ -304,7 +339,10 @@ app.post('/api/verify', async (req, res) => {
   }
 });
 
-// ===== DEVELOPER LOGIN =====
+// ================================================================
+// 7. DEVELOPER LOGIN
+// ================================================================
+
 app.post('/api/developer-login', async (req, res) => {
   const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
   const userAgent = req.headers['user-agent'] || '';
@@ -350,7 +388,10 @@ app.post('/api/developer-login', async (req, res) => {
   }
 });
 
-// ===== CEK SESSION =====
+// ================================================================
+// 8. CEK SESSION
+// ================================================================
+
 app.get('/api/check-session', async (req, res) => {
   try {
     const sessionId = req.cookies.sessionId;
@@ -392,7 +433,10 @@ app.get('/api/check-session', async (req, res) => {
   }
 });
 
-// ===== KIRIM PESAN =====
+// ================================================================
+// 9. KIRIM PESAN
+// ================================================================
+
 app.post('/api/chat/send', checkSession, async (req, res) => {
   try {
     const { message } = req.body;
@@ -420,7 +464,10 @@ app.post('/api/chat/send', checkSession, async (req, res) => {
   }
 });
 
-// ===== AMBIL PESAN =====
+// ================================================================
+// 10. AMBIL PESAN
+// ================================================================
+
 app.get('/api/chat/messages', checkSession, async (req, res) => {
   try {
     const chatKey = 'chat:global';
@@ -436,7 +483,10 @@ app.get('/api/chat/messages', checkSession, async (req, res) => {
   }
 });
 
-// ===== CLEAR MESSAGES =====
+// ================================================================
+// 11. CLEAR MESSAGES (Developer Only)
+// ================================================================
+
 app.delete('/api/chat/clear', checkDeveloper, async (req, res) => {
   try {
     const chatKey = 'chat:global';
@@ -447,7 +497,11 @@ app.delete('/api/chat/clear', checkDeveloper, async (req, res) => {
   }
 });
 
-// ===== GET IP LIST =====
+// ================================================================
+// 12. IP CONTROL (Developer Only)
+// ================================================================
+
+// GET IP LIST
 app.get('/api/ip-list', checkDeveloper, async (req, res) => {
   try {
     const keys = await redis.keys('ip:*');
@@ -468,7 +522,6 @@ app.get('/api/ip-list', checkDeveloper, async (req, res) => {
         });
       }
     }
-    // Sort by lastSeen descending
     ips.sort((a, b) => new Date(b.lastSeen) - new Date(a.lastSeen));
     res.json({ success: true, ips });
   } catch (error) {
@@ -476,7 +529,7 @@ app.get('/api/ip-list', checkDeveloper, async (req, res) => {
   }
 });
 
-// ===== BAN IP =====
+// BAN IP
 app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
   try {
     const { ip, reason } = req.body;
@@ -495,7 +548,7 @@ app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
   }
 });
 
-// ===== UNBAN IP =====
+// UNBAN IP
 app.post('/api/unban-ip', checkDeveloper, async (req, res) => {
   try {
     const { ip } = req.body;
@@ -510,7 +563,7 @@ app.post('/api/unban-ip', checkDeveloper, async (req, res) => {
   }
 });
 
-// ===== DELETE IP FROM HISTORY =====
+// DELETE IP FROM HISTORY
 app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
   try {
     const { ip } = req.body;
@@ -518,7 +571,6 @@ app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
       return res.status(400).json({ error: 'IP wajib diisi!' });
     }
     
-    // Cek apakah IP diban
     const isBanned = await redis.get(`ban:${ip}`);
     if (isBanned) {
       return res.status(400).json({ 
@@ -528,14 +580,16 @@ app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
     }
     
     await redis.del(`ip:${ip}`);
-    ipHistory.delete(ip);
     res.json({ success: true, message: `✅ IP ${ip} berhasil dihapus dari history.` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== TEST SECURITY =====
+// ================================================================
+// 13. TEST SECURITY (Developer Only)
+// ================================================================
+
 app.get('/api/test-security', checkDeveloper, async (req, res) => {
   try {
     const keys = await redis.keys('ip:*');
@@ -558,7 +612,10 @@ app.get('/api/test-security', checkDeveloper, async (req, res) => {
   }
 });
 
-// ===== TYPING =====
+// ================================================================
+// 14. TYPING INDICATOR
+// ================================================================
+
 app.post('/api/typing', checkSession, async (req, res) => {
   try {
     const { isTyping } = req.body;
@@ -589,7 +646,10 @@ app.get('/api/typing-users', checkSession, async (req, res) => {
   }
 });
 
-// ===== ONLINE USERS =====
+// ================================================================
+// 15. ONLINE USERS
+// ================================================================
+
 app.get('/api/online-users', checkSession, async (req, res) => {
   try {
     const keys = await redis.keys('session:*');
@@ -607,7 +667,10 @@ app.get('/api/online-users', checkSession, async (req, res) => {
   }
 });
 
-// ===== LOGOUT =====
+// ================================================================
+// 16. LOGOUT
+// ================================================================
+
 app.post('/api/logout', async (req, res) => {
   try {
     const sessionId = req.cookies.sessionId;
@@ -618,6 +681,19 @@ app.post('/api/logout', async (req, res) => {
     res.json({ success: true, message: 'Logout berhasil.' });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ================================================================
+// 17. TEST REDIS (Opsional)
+// ================================================================
+
+app.get('/api/ping', async (req, res) => {
+  try {
+    const pong = await redis.ping();
+    res.json({ status: '✅ Redis Connected!', pong });
+  } catch (error) {
+    res.status(500).json({ status: '❌ Redis Error', error: error.message });
   }
 });
 
