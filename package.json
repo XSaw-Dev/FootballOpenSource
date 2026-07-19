@@ -1,7 +1,7 @@
 {
   "name": "cyber-chat",
   "version": "1.0.0",
-  "description": "Cyber chat room with custom captcha & auto-delete",
+  "description": "Cyber chat room with custom captcha & auto-delete 1 hour",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js"
