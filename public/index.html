@@ -9,34 +9,36 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f0f1a;
+            background: #0a0a14;
             color: #e0e0e0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: radial-gradient(ellipse at 50% 0%, rgba(88, 50, 200, 0.08) 0%, transparent 70%);
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(88, 50, 200, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse at 80% 100%, rgba(50, 200, 200, 0.03) 0%, transparent 50%);
         }
         
         .container {
             width: 100%;
-            max-width: 900px;
-            padding: 20px;
+            max-width: 920px;
+            padding: 16px;
             height: 100vh;
             display: flex;
             align-items: center;
         }
         
         .chat-card {
-            background: rgba(20, 20, 35, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(16, 16, 30, 0.94);
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 24px;
-            padding: 30px;
+            padding: 28px 30px 24px;
             width: 100%;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            height: 90vh;
-            max-height: 800px;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+            height: 92vh;
+            max-height: 780px;
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
@@ -44,22 +46,23 @@
         
         .chat-title {
             text-align: center;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #a78bfa, #8b5cf6);
+            background: linear-gradient(135deg, #a78bfa, #8b5cf6, #6d28d9);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             flex-shrink: 0;
+            letter-spacing: 1px;
         }
         
         .chat-subtitle {
             text-align: center;
-            color: rgba(255, 255, 255, 0.15);
-            font-size: 0.7rem;
-            letter-spacing: 6px;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 0.6rem;
+            letter-spacing: 5px;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             flex-shrink: 0;
         }
         
@@ -71,33 +74,33 @@
             justify-content: center;
             flex: 1;
             text-align: center;
-            gap: 15px;
+            gap: 12px;
         }
         
-        .gateway-icon { font-size: 4rem; animation: float 3s ease-in-out infinite; }
+        .gateway-icon { font-size: 3.6rem; animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .gateway-title { font-size: 1.5rem; font-weight: 600; color: #e0e0e0; }
-        .gateway-desc { color: rgba(255, 255, 255, 0.2); font-size: 0.8rem; letter-spacing: 2px; }
+        .gateway-title { font-size: 1.3rem; font-weight: 600; color: #e0e0e0; }
+        .gateway-desc { color: rgba(255, 255, 255, 0.15); font-size: 0.7rem; letter-spacing: 2px; }
         
         .gateway-status {
-            padding: 10px 24px;
+            padding: 8px 22px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 30px;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.3);
-            min-width: 200px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.25);
+            min-width: 180px;
         }
-        .gateway-status.valid { border-color: rgba(52, 211, 153, 0.3); color: #34d399; }
-        .gateway-status.expired { border-color: rgba(251, 113, 133, 0.3); color: #fb7185; }
+        .gateway-status.valid { border-color: rgba(52, 211, 153, 0.25); color: #34d399; }
+        .gateway-status.expired { border-color: rgba(251, 113, 133, 0.2); color: #fb7185; }
         
         /* ===== VERIFIKASI ===== */
         #verifySection {
             display: none;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
             flex: 1;
             justify-content: center;
-            max-width: 500px;
+            max-width: 440px;
             margin: 0 auto;
             width: 100%;
         }
@@ -109,223 +112,286 @@
             min-height: 0;
         }
         
-        .input-group { display: flex; flex-direction: column; gap: 8px; }
-        .input-group label { color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; font-weight: 500; letter-spacing: 1px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group label { color: rgba(255, 255, 255, 0.3); font-size: 0.7rem; font-weight: 500; letter-spacing: 1px; }
         
         .input-field {
-            padding: 14px 18px;
+            padding: 12px 16px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             color: #e0e0e0;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
             font-family: inherit;
         }
-        .input-field:focus { outline: none; border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 0 30px rgba(139, 92, 246, 0.05); background: rgba(255, 255, 255, 0.06); }
-        .input-field::placeholder { color: rgba(255, 255, 255, 0.1); }
+        .input-field:focus { outline: none; border-color: rgba(139, 92, 246, 0.3); background: rgba(255, 255, 255, 0.06); }
+        .input-field::placeholder { color: rgba(255, 255, 255, 0.08); }
         
         .captcha-box {
             background: rgba(255, 255, 255, 0.02);
             border: 1px dashed rgba(255, 255, 255, 0.06);
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px;
             text-align: center;
         }
-        .captcha-box .question { font-size: 2rem; font-weight: 600; color: #a78bfa; }
-        .captcha-box .hint { color: rgba(255, 255, 255, 0.1); font-size: 0.7rem; margin-top: 5px; letter-spacing: 2px; }
+        .captcha-box .question { font-size: 1.8rem; font-weight: 600; color: #a78bfa; }
+        .captcha-box .hint { color: rgba(255, 255, 255, 0.08); font-size: 0.6rem; margin-top: 4px; letter-spacing: 2px; }
         
         .btn {
-            padding: 14px 24px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, #8b5cf6, #7c3aed);
             border: none;
             border-radius: 12px;
             color: white;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: inherit;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(139, 92, 246, 0.2); }
         .btn:active { transform: translateY(0); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.06); }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-        .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.06); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
+        .btn-sm { padding: 6px 14px; font-size: 0.7rem; border-radius: 8px; }
         .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .btn-danger:hover { box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { box-shadow: 0 8px 28px rgba(239, 68, 68, 0.2); }
         .btn-developer { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-developer:hover { box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2); }
+        .btn-developer:hover { box-shadow: 0 8px 28px rgba(245, 158, 11, 0.2); }
         .btn-clear { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .btn-clear:hover { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2); }
+        .btn-clear:hover { box-shadow: 0 8px 28px rgba(139, 92, 246, 0.2); }
+        .btn-success { background: linear-gradient(135deg, #34d399, #10b981); }
+        .btn-success:hover { box-shadow: 0 8px 28px rgba(52, 211, 153, 0.2); }
         
         /* ===== DEVELOPER LOGIN ===== */
         #developerLoginSection {
             display: none;
             flex-direction: column;
-            gap: 15px;
-            padding: 20px;
-            border: 1px solid rgba(245, 158, 11, 0.15);
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid rgba(245, 158, 11, 0.12);
             border-radius: 12px;
-            background: rgba(245, 158, 11, 0.03);
-            margin-top: 10px;
+            background: rgba(245, 158, 11, 0.02);
+            margin-top: 8px;
         }
         #developerLoginSection.active { display: flex; }
         
-        .developer-toggle { text-align: center; margin-top: 10px; }
-        .developer-toggle button { background: none; border: none; color: rgba(255, 255, 255, 0.15); font-size: 0.7rem; cursor: pointer; text-decoration: underline; font-family: inherit; }
-        .developer-toggle button:hover { color: rgba(255, 255, 255, 0.3); }
+        .developer-toggle { text-align: center; margin-top: 8px; }
+        .developer-toggle button { background: none; border: none; color: rgba(255, 255, 255, 0.12); font-size: 0.65rem; cursor: pointer; text-decoration: underline; font-family: inherit; }
+        .developer-toggle button:hover { color: rgba(255, 255, 255, 0.25); }
         
         /* ===== CHAT ===== */
         .chat-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
         
-        .chat-user { color: rgba(255, 255, 255, 0.3); font-size: 0.8rem; }
+        .chat-user { color: rgba(255, 255, 255, 0.2); font-size: 0.75rem; }
         .chat-user span { color: #a78bfa; font-weight: 600; }
         .chat-user .badge-developer {
             display: inline-block;
             background: #3b82f6;
             color: white;
-            font-size: 0.6rem;
+            font-size: 0.5rem;
             padding: 2px 10px;
             border-radius: 12px;
             margin-left: 6px;
             font-weight: 600;
         }
         
-        .chat-status { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .status-online { color: #34d399; font-size: 0.7rem; display: flex; align-items: center; gap: 5px; }
-        .status-online .dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; animation: pulse-dot 2s infinite; }
+        .chat-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .status-online { color: #34d399; font-size: 0.65rem; display: flex; align-items: center; gap: 4px; }
+        .status-online .dot { width: 5px; height: 5px; border-radius: 50%; background: #34d399; animation: pulse-dot 2s infinite; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .online-count { color: rgba(255, 255, 255, 0.15); font-size: 0.7rem; }
-        .chat-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .online-count { color: rgba(255, 255, 255, 0.1); font-size: 0.65rem; }
+        .chat-actions { display: flex; gap: 6px; flex-wrap: wrap; }
         
         /* ===== MESSAGES ===== */
         #messages {
             flex: 1;
             overflow-y: auto;
-            padding: 15px 10px;
-            background: rgba(255, 255, 255, 0.015);
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.01);
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.02);
-            margin: 12px 0;
+            margin: 10px 0;
             min-height: 0;
         }
-        #messages::-webkit-scrollbar { width: 4px; }
-        #messages::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.015); }
+        #messages::-webkit-scrollbar { width: 3px; }
+        #messages::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.01); }
         #messages::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.2); border-radius: 10px; }
         
         .message {
-            padding: 10px 14px;
-            margin-bottom: 6px;
-            background: rgba(255, 255, 255, 0.025);
-            border-left: 3px solid rgba(139, 92, 246, 0.2);
-            border-radius: 8px;
-            animation: fadeIn 0.3s ease-out;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 3px solid rgba(139, 92, 246, 0.15);
+            border-radius: 6px;
+            animation: fadeIn 0.25s ease-out;
         }
-        .message.developer { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        .message.developer { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.04); }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
         
         .message .msg-user {
             font-weight: 600;
-            font-size: 0.8rem;
-            margin-bottom: 3px;
+            font-size: 0.7rem;
+            margin-bottom: 2px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             flex-wrap: wrap;
         }
         .message .msg-user .dev-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             background: #3b82f6;
             color: white;
-            font-size: 0.5rem;
-            padding: 1px 10px;
-            border-radius: 12px;
+            font-size: 0.45rem;
+            padding: 1px 8px;
+            border-radius: 10px;
             font-weight: 600;
         }
-        .message .msg-text { font-size: 0.9rem; color: #d0d0d0; word-break: break-word; line-height: 1.4; }
-        .message .msg-time { color: rgba(255, 255, 255, 0.06); font-size: 0.5rem; float: right; margin-top: 2px; }
+        .message .msg-text { font-size: 0.85rem; color: #d0d0d0; word-break: break-word; line-height: 1.4; }
+        .message .msg-time { color: rgba(255, 255, 255, 0.04); font-size: 0.45rem; float: right; margin-top: 1px; }
         
-        .empty-chat { text-align: center; color: rgba(255, 255, 255, 0.04); padding: 60px 0; font-size: 0.9rem; }
-        .empty-chat .icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.15; }
+        .empty-chat { text-align: center; color: rgba(255, 255, 255, 0.03); padding: 50px 0; font-size: 0.8rem; }
+        .empty-chat .icon { font-size: 2.2rem; margin-bottom: 8px; opacity: 0.1; }
         
         .typing-indicator {
-            color: rgba(255, 255, 255, 0.08);
-            font-size: 0.7rem;
-            padding: 3px 15px;
-            min-height: 24px;
+            color: rgba(255, 255, 255, 0.06);
+            font-size: 0.65rem;
+            padding: 2px 12px;
+            min-height: 20px;
             transition: all 0.3s ease;
             flex-shrink: 0;
         }
-        .typing-indicator.active { color: rgba(139, 92, 246, 0.3); }
+        .typing-indicator.active { color: rgba(139, 92, 246, 0.25); }
         
         .chat-input-area {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
-            padding-top: 5px;
+            padding-top: 4px;
             flex-wrap: wrap;
         }
-        .chat-input-area .input-field { flex: 1; min-width: 150px; }
-        .chat-input-area .btn { padding: 14px 28px; flex-shrink: 0; }
+        .chat-input-area .input-field { flex: 1; min-width: 120px; padding: 10px 14px; font-size: 0.85rem; }
+        .chat-input-area .btn { padding: 10px 22px; font-size: 0.85rem; flex-shrink: 0; }
         
         /* ===== DEVELOPER DASHBOARD ===== */
         #developerDashboard {
             display: none;
             flex-direction: column;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(59, 130, 246, 0.03);
-            border: 1px solid rgba(59, 130, 246, 0.08);
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(59, 130, 246, 0.02);
+            border: 1px solid rgba(59, 130, 246, 0.06);
             border-radius: 12px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             flex-shrink: 0;
         }
         #developerDashboard.active { display: flex; }
         
-        .dev-dashboard-title { color: #3b82f6; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-        .dev-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; }
-        .dev-stat { background: rgba(255, 255, 255, 0.02); padding: 10px; border-radius: 8px; text-align: center; }
-        .dev-stat .value { font-size: 1.2rem; font-weight: 600; color: #a78bfa; }
-        .dev-stat .label { font-size: 0.6rem; color: rgba(255, 255, 255, 0.15); margin-top: 2px; }
-        .dev-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .dev-actions .btn { flex: 1; min-width: 100px; }
+        .dev-dashboard-title { color: #3b82f6; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .dev-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0; }
+        .dev-tabs .btn { padding: 4px 14px; font-size: 0.6rem; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); }
+        .dev-tabs .btn.active { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .dev-tabs .btn:hover { background: rgba(255,255,255,0.06); }
+        
+        .dev-tab-content { display: none; padding: 4px 0; }
+        .dev-tab-content.active { display: block; }
+        
+        .dev-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 10px; }
+        .dev-stat { background: rgba(255, 255, 255, 0.02); padding: 8px; border-radius: 8px; text-align: center; }
+        .dev-stat .value { font-size: 1.1rem; font-weight: 600; color: #a78bfa; }
+        .dev-stat .label { font-size: 0.5rem; color: rgba(255, 255, 255, 0.12); margin-top: 1px; }
+        .dev-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .dev-actions .btn { flex: 1; min-width: 80px; padding: 8px 12px; font-size: 0.7rem; }
+        
+        /* ===== IP CONTROL ===== */
+        .ip-control-bar { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+        .ip-control-bar .input-field { flex: 1; min-width: 120px; padding: 8px 12px; font-size: 0.75rem; }
+        .ip-control-bar .btn { padding: 8px 14px; font-size: 0.65rem; }
+        
+        #ipListContainer {
+            max-height: 180px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            padding: 6px;
+        }
+        #ipListContainer::-webkit-scrollbar { width: 3px; }
+        #ipListContainer::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.15); border-radius: 10px; }
+        
+        .ip-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 6px;
+            border-left: 2px solid rgba(139, 92, 246, 0.1);
+            margin-bottom: 3px;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .ip-item.banned { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.04); }
+        .ip-item .ip-info { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .ip-item .ip-info .ip-addr { font-size: 0.7rem; color: #c0c0c0; }
+        .ip-item .ip-info .ip-badge { font-size: 0.45rem; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
+        .ip-item .ip-info .ip-badge.banned { background: #ef4444; color: white; }
+        .ip-item .ip-info .ip-badge.normal { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
+        .ip-item .ip-info .ip-detail { color: rgba(255, 255, 255, 0.08); font-size: 0.45rem; }
+        .ip-item .ip-actions { display: flex; gap: 3px; flex-wrap: wrap; }
+        .ip-item .ip-actions .btn { padding: 2px 10px; font-size: 0.5rem; border-radius: 6px; }
         
         .error {
             color: #fb7185;
             text-align: center;
-            padding: 10px;
-            border: 1px solid rgba(251, 113, 133, 0.1);
+            padding: 8px;
+            border: 1px solid rgba(251, 113, 133, 0.08);
             border-radius: 8px;
             display: none;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             flex-shrink: 0;
         }
         
+        .security-result {
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.65rem;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 8px;
+            margin-top: 6px;
+            display: none;
+            line-height: 1.6;
+        }
+        .security-result.success { color: #34d399; border: 1px solid rgba(52, 211, 153, 0.1); }
+        .security-result.error { color: #fb7185; border: 1px solid rgba(251, 113, 133, 0.1); }
+        
         @media (max-width: 600px) {
-            .container { padding: 10px; }
-            .chat-card { padding: 20px; height: 95vh; max-height: none; border-radius: 16px; }
-            .chat-title { font-size: 1.5rem; }
-            .chat-header { flex-direction: column; align-items: stretch; gap: 8px; }
+            .container { padding: 8px; }
+            .chat-card { padding: 16px; height: 96vh; max-height: none; border-radius: 16px; }
+            .chat-title { font-size: 1.3rem; }
+            .chat-header { flex-direction: column; align-items: stretch; gap: 6px; }
             .chat-status { justify-content: space-between; }
             .chat-input-area { flex-direction: column; }
             .chat-input-area .btn { width: 100%; }
-            .captcha-box .question { font-size: 1.5rem; }
-            #messages { height: 300px; }
+            .captcha-box .question { font-size: 1.4rem; }
+            #messages { height: 280px; }
             .dev-actions .btn { min-width: 100%; }
+            .ip-control-bar { flex-direction: column; }
+            .ip-item { flex-direction: column; align-items: stretch; gap: 4px; }
+            .ip-item .ip-actions { justify-content: flex-end; }
         }
     </style>
 </head>
@@ -361,7 +427,7 @@
                 </div>
                 <input type="text" id="captchaAnswer" class="input-field" placeholder="Masukkan hasil penjumlahan..." required style="margin-top:8px;">
                 <input type="hidden" id="captchaId">
-                <button class="btn" onclick="verifyCaptcha()" style="margin-top:12px;" id="verifyBtn">🚀 Verifikasi</button>
+                <button class="btn" onclick="verifyCaptcha()" style="margin-top:10px;" id="verifyBtn">🚀 Verifikasi</button>
             </div>
             
             <div class="developer-toggle">
@@ -400,25 +466,53 @@
             <!-- ===== DEVELOPER DASHBOARD ===== -->
             <div id="developerDashboard">
                 <div class="dev-dashboard-title">📊 Developer Dashboard</div>
-                <div class="dev-stats">
-                    <div class="dev-stat">
-                        <div class="value" id="statUsers">0</div>
-                        <div class="label">Online Users</div>
+                <div class="dev-tabs">
+                    <button class="btn active" onclick="showDevTab('stats')" data-tab="stats">📊 Stats</button>
+                    <button class="btn" onclick="showDevTab('ipcontrol')" data-tab="ipcontrol">🌐 Control IP</button>
+                    <button class="btn" onclick="showDevTab('security')" data-tab="security">🛡️ Security</button>
+                </div>
+                
+                <!-- Tab: Stats -->
+                <div id="devTabStats" class="dev-tab-content active">
+                    <div class="dev-stats">
+                        <div class="dev-stat">
+                            <div class="value" id="statUsers">0</div>
+                            <div class="label">Online Users</div>
+                        </div>
+                        <div class="dev-stat">
+                            <div class="value" id="statMessages">0</div>
+                            <div class="label">Total Messages</div>
+                        </div>
+                        <div class="dev-stat">
+                            <div class="value" id="statBlocked">0</div>
+                            <div class="label">Blocked IPs</div>
+                        </div>
                     </div>
-                    <div class="dev-stat">
-                        <div class="value" id="statMessages">0</div>
-                        <div class="label">Total Messages</div>
-                    </div>
-                    <div class="dev-stat">
-                        <div class="value" id="statBlocked">0</div>
-                        <div class="label">Blocked IPs</div>
+                    <div class="dev-actions">
+                        <button class="btn btn-clear btn-sm" onclick="clearMessages()">🗑️ Clear Messages</button>
                     </div>
                 </div>
-                <div class="dev-actions">
-                    <button class="btn btn-clear btn-sm" onclick="clearMessages()">🗑️ Clear Messages</button>
-                    <button class="btn btn-secondary btn-sm" onclick="testSecurity()">🛡️ Test Security</button>
+                
+                <!-- Tab: Control IP -->
+                <div id="devTabIpcontrol" class="dev-tab-content">
+                    <div class="ip-control-bar">
+                        <input type="text" id="banIpInput" class="input-field" placeholder="IP address...">
+                        <button class="btn btn-danger btn-sm" onclick="banIp()">🚫 Ban</button>
+                        <button class="btn btn-success btn-sm" onclick="unbanIp()">✅ Unban</button>
+                        <button class="btn btn-secondary btn-sm" onclick="loadIpList()">🔄 Refresh</button>
+                    </div>
+                    <div id="ipListContainer">
+                        <div style="color:rgba(255,255,255,0.05);text-align:center;padding:12px;font-size:0.7rem;">Loading IP list...</div>
+                    </div>
                 </div>
-                <div id="securityTestResult" style="color:rgba(255,255,255,0.3);font-size:0.7rem;padding:5px;display:none;"></div>
+                
+                <!-- Tab: Security -->
+                <div id="devTabSecurity" class="dev-tab-content">
+                    <div class="dev-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="testSecurity()">🛡️ Test Security Gateway</button>
+                    </div>
+                    <div id="securityTestResult" class="security-result"></div>
+                </div>
             </div>
             
             <div id="messages">
@@ -437,15 +531,9 @@
 </div>
 
 <script>
-    let refreshInterval = null;
-    let typingInterval = null;
-    let lastMessageCount = 0;
-    let isDeveloper = false;
-    let username = '';
-    let isVerifying = false;
-    let isDeveloperLogin = false;
-    
-    // ===== ANTI-DEVTOOLS =====
+    // ============================================================
+    // 1. ANTI-DEVTOOLS
+    // ============================================================
     document.addEventListener('keydown', (e) => {
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
             e.preventDefault();
@@ -455,7 +543,19 @@
     });
     document.addEventListener('contextmenu', (e) => { e.preventDefault(); showError('⛔ Right-click diblokir.'); return false; });
     
-    // ===== AUTO CHECK SESSION =====
+    // ============================================================
+    // 2. GLOBAL VARIABLES
+    // ============================================================
+    let refreshInterval = null;
+    let typingInterval = null;
+    let lastMessageCount = 0;
+    let isDeveloper = false;
+    let username = '';
+    let isVerifying = false;
+    
+    // ============================================================
+    // 3. AUTO CHECK SESSION
+    // ============================================================
     async function autoCheckSession() {
         const statusEl = document.getElementById('gatewayStatus');
         statusEl.textContent = '⏳ Memeriksa session...';
@@ -508,7 +608,9 @@
         updateOnlineUsers();
     }
     
-    // ===== CAPTCHA =====
+    // ============================================================
+    // 4. CAPTCHA
+    // ============================================================
     async function loadCaptcha() {
         try {
             const res = await fetch('/api/captcha');
@@ -566,7 +668,9 @@
         isVerifying = false;
     }
     
-    // ===== DEVELOPER LOGIN =====
+    // ============================================================
+    // 5. DEVELOPER LOGIN
+    // ============================================================
     function toggleDeveloperLogin() {
         const section = document.getElementById('developerLoginSection');
         section.classList.toggle('active');
@@ -595,7 +699,6 @@
             
             if (data.success) {
                 isDeveloper = true;
-                isDeveloperLogin = true;
                 showError('✅ Login developer berhasil!');
                 setTimeout(() => location.reload(), 1000);
             } else {
@@ -606,7 +709,9 @@
         }
     }
     
-    // ===== MESSAGES =====
+    // ============================================================
+    // 6. MESSAGES
+    // ============================================================
     async function sendMessage() {
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
@@ -689,7 +794,9 @@
         container.scrollTop = container.scrollHeight;
     }
     
-    // ===== CLEAR MESSAGES (Developer Only) =====
+    // ============================================================
+    // 7. CLEAR MESSAGES (Developer Only)
+    // ============================================================
     async function clearMessages() {
         if (!confirm('⚠️ Yakin mau hapus semua pesan? Tindakan ini tidak bisa dibatalkan!')) return;
         
@@ -711,7 +818,9 @@
         }
     }
     
-    // ===== TYPING INDICATOR =====
+    // ============================================================
+    // 8. TYPING INDICATOR
+    // ============================================================
     document.getElementById('chatInput').addEventListener('input', function() {
         const indicator = document.getElementById('typingIndicator');
         const isTyping = this.value.length > 0;
@@ -724,7 +833,6 @@
             indicator.textContent = '✎ ...';
         }
         
-        // Kirim status typing ke server
         fetch('/api/typing', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -753,7 +861,9 @@
         }, 3000);
     }
     
-    // ===== ONLINE USERS =====
+    // ============================================================
+    // 9. ONLINE USERS
+    // ============================================================
     async function updateOnlineUsers() {
         try {
             const res = await fetch('/api/online-users', { credentials: 'include' });
@@ -766,7 +876,9 @@
         } catch {}
     }
     
-    // ===== DEVELOPER DASHBOARD =====
+    // ============================================================
+    // 10. DEVELOPER DASHBOARD
+    // ============================================================
     function toggleDeveloperDashboard() {
         const dashboard = document.getElementById('developerDashboard');
         dashboard.classList.toggle('active');
@@ -775,19 +887,165 @@
         }
     }
     
+    function showDevTab(tab) {
+        document.querySelectorAll('.dev-tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.dev-tabs .btn').forEach(el => el.classList.remove('active'));
+        
+        const tabMap = {
+            'stats': 'devTabStats',
+            'ipcontrol': 'devTabIpcontrol',
+            'security': 'devTabSecurity'
+        };
+        
+        const target = document.getElementById(tabMap[tab]);
+        if (target) target.classList.add('active');
+        
+        const btn = document.querySelector(`.dev-tabs .btn[data-tab="${tab}"]`);
+        if (btn) btn.classList.add('active');
+        
+        if (tab === 'ipcontrol') loadIpList();
+        if (tab === 'stats') loadDeveloperStats();
+    }
+    
     async function loadDeveloperStats() {
         try {
             const res = await fetch('/api/test-security', { credentials: 'include' });
             const data = await res.json();
             if (data.success) {
-                document.getElementById('statBlocked').textContent = data.blockedIPs ? data.blockedIPs.length : 0;
+                document.getElementById('statBlocked').textContent = data.totalBanned || 0;
             }
         } catch {}
     }
     
+    // ============================================================
+    // 11. IP CONTROL
+    // ============================================================
+    async function loadIpList() {
+        const container = document.getElementById('ipListContainer');
+        container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:12px;font-size:0.7rem;">⏳ Loading IP list...</div>';
+        
+        try {
+            const res = await fetch('/api/ip-list', { credentials: 'include' });
+            const data = await res.json();
+            
+            if (data.success && data.ips && data.ips.length > 0) {
+                let html = '';
+                data.ips.forEach(item => {
+                    const isBanned = item.isBanned;
+                    html += `
+                        <div class="ip-item${isBanned ? ' banned' : ''}">
+                            <div class="ip-info">
+                                <span class="ip-addr">${item.ip}</span>
+                                <span class="ip-badge ${isBanned ? 'banned' : 'normal'}">${isBanned ? 'BANNED' : 'Active'}</span>
+                                <span class="ip-detail">${item.attempts || 0} attempts • ${new Date(item.lastSeen).toLocaleDateString()}</span>
+                            </div>
+                            <div class="ip-actions">
+                                ${!isBanned ? `<button class="btn btn-danger btn-sm" onclick="banIpManual('${item.ip}')">Ban</button>` : `<button class="btn btn-success btn-sm" onclick="unbanIpManual('${item.ip}')">Unban</button>`}
+                                <button class="btn btn-secondary btn-sm" onclick="deleteIpHistory('${item.ip}')" ${isBanned ? 'disabled style="opacity:0.3;"' : ''}>🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:12px;font-size:0.7rem;">Belum ada IP yang tercatat.</div>';
+            }
+        } catch (error) {
+            container.innerHTML = `<div style="color:#fb7185;text-align:center;padding:12px;font-size:0.7rem;">❌ Error: ${error.message}</div>`;
+        }
+    }
+    
+    async function banIp() {
+        const ip = document.getElementById('banIpInput').value.trim();
+        if (!ip) { showError('Masukkan IP address!'); return; }
+        await banIpManual(ip);
+    }
+    
+    async function banIpManual(ip) {
+        if (!confirm(`🚫 Yakin mau ban IP ${ip}?`)) return;
+        
+        try {
+            const res = await fetch('/api/ban-ip', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip, reason: 'Diblokir oleh admin' }),
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.success) {
+                showError(`✅ ${data.message}`);
+                loadIpList();
+                loadDeveloperStats();
+            } else {
+                showError(data.error || 'Gagal ban IP');
+            }
+        } catch (error) {
+            showError('Error: ' + error.message);
+        }
+    }
+    
+    async function unbanIp() {
+        const ip = document.getElementById('banIpInput').value.trim();
+        if (!ip) { showError('Masukkan IP address!'); return; }
+        await unbanIpManual(ip);
+    }
+    
+    async function unbanIpManual(ip) {
+        if (!confirm(`✅ Yakin mau unban IP ${ip}?`)) return;
+        
+        try {
+            const res = await fetch('/api/unban-ip', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip }),
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.success) {
+                showError(`✅ ${data.message}`);
+                loadIpList();
+                loadDeveloperStats();
+            } else {
+                showError(data.error || 'Gagal unban IP');
+            }
+        } catch (error) {
+            showError('Error: ' + error.message);
+        }
+    }
+    
+    async function deleteIpHistory(ip) {
+        if (!confirm(`⚠️ Yakin mau hapus IP ${ip} dari history?`)) return;
+        
+        try {
+            const res = await fetch('/api/delete-ip', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip }),
+                credentials: 'include'
+            });
+            const data = await res.json();
+            if (data.success) {
+                showError(`✅ ${data.message}`);
+                loadIpList();
+            } else {
+                if (data.isBanned) {
+                    showError('❌ IP ini masih diban! Unban dulu sebelum menghapus.');
+                } else {
+                    showError(data.error || 'Gagal hapus IP');
+                }
+            }
+        } catch (error) {
+            showError('Error: ' + error.message);
+        }
+    }
+    
+    // ============================================================
+    // 12. SECURITY TEST
+    // ============================================================
     async function testSecurity() {
         const result = document.getElementById('securityTestResult');
         result.style.display = 'block';
+        result.className = 'security-result';
         result.textContent = '⏳ Menguji keamanan...';
         
         try {
@@ -797,31 +1055,35 @@
                 result.innerHTML = `
                     ✅ Security Gateway berfungsi normal!<br>
                     Session: ${data.session.username} (${data.session.isDeveloper ? 'Developer' : 'User'})<br>
-                    Blocked IPs: ${data.blockedIPs ? data.blockedIPs.length : 0}
+                    Total IPs: ${data.totalIPs || 0} • Banned: ${data.totalBanned || 0}
                 `;
-                result.style.color = '#34d399';
+                result.className = 'security-result success';
             } else {
                 result.textContent = '❌ Error: ' + (data.error || 'Gagal test security');
-                result.style.color = '#fb7185';
+                result.className = 'security-result error';
             }
         } catch (error) {
             result.textContent = '❌ Error: ' + error.message;
-            result.style.color = '#fb7185';
+            result.className = 'security-result error';
         }
         
         setTimeout(() => {
             result.style.display = 'none';
-        }, 5000);
+        }, 6000);
     }
     
-    // ===== LOGOUT =====
+    // ============================================================
+    // 13. LOGOUT
+    // ============================================================
     async function logout() {
         await fetch('/api/logout', { method: 'POST' });
         document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         location.reload();
     }
     
-    // ===== AUTO REFRESH =====
+    // ============================================================
+    // 14. AUTO REFRESH
+    // ============================================================
     function startAutoRefresh() {
         if (refreshInterval) clearInterval(refreshInterval);
         refreshInterval = setInterval(() => {
@@ -830,7 +1092,9 @@
         }, 3000);
     }
     
-    // ===== ERROR HANDLING =====
+    // ============================================================
+    // 15. ERROR HANDLING
+    // ============================================================
     function showError(msg) {
         const el = document.getElementById('errorMsg');
         el.textContent = msg;
@@ -839,7 +1103,9 @@
     }
     function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
     
-    // ===== ENTER KEY =====
+    // ============================================================
+    // 16. ENTER KEY
+    // ============================================================
     document.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             if (document.getElementById('chatSection').style.display === 'flex') {
@@ -850,10 +1116,12 @@
         }
     });
     
-    // ===== INIT =====
+    // ============================================================
+    // 17. INIT
+    // ============================================================
     window.onload = function() {
         autoCheckSession();
     };
 </script>
 </body>
-                        </html>
+                    </html>
