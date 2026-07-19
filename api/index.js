@@ -60,7 +60,6 @@ function getRealIP(req) {
 async function logIP(req, res, next) {
   const ip = getRealIP(req);
   
-  // Skip buat asset static biar gak penuh
   if (req.path.startsWith('/_next/') || req.path.startsWith('/static/') || req.path === '/favicon.ico') {
     return next();
   }
@@ -79,8 +78,6 @@ async function logIP(req, res, next) {
     data.path = req.path;
     
     await redis.setex(`ip:${ip}`, 2592000, JSON.stringify(data));
-    
-    console.log(`📝 IP tercatat: ${ip} | Total visits: ${data.totalVisits} | Path: ${req.path}`);
   } catch (error) {
     console.error('❌ Gagal log IP:', error.message);
   }
@@ -89,7 +86,7 @@ async function logIP(req, res, next) {
 }
 
 // ================================================================
-// 2. MIDDLEWARE BAN CHECK
+// 2. MIDDLEWARE BAN CHECK + REDIRECT
 // ================================================================
 
 async function checkBan(req, res, next) {
@@ -126,8 +123,7 @@ async function checkBan(req, res, next) {
   next();
 }
 
-// PAKAI MIDDLEWARE
-app.use(logIP);   // <-- PENTING: logIP DULUAN
+app.use(logIP);
 app.use(checkBan);
 
 // ================================================================
@@ -260,7 +256,6 @@ app.post('/api/verify', async (req, res) => {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
     
-    // CEK BAN DULU
     const redisBan = await redis.get(`ban:${ip}`);
     if (redisBan) {
       const banData = JSON.parse(redisBan);
@@ -282,7 +277,6 @@ app.post('/api/verify', async (req, res) => {
     }
     
     if (!verified) {
-      // Update attempts
       const existing = await redis.get(`ip:${ip}`);
       let data = existing ? JSON.parse(existing) : { firstSeen: new Date().toISOString(), attempts: 0, totalVisits: 0 };
       data.attempts = (data.attempts || 0) + 1;
@@ -290,7 +284,6 @@ app.post('/api/verify', async (req, res) => {
       
       await redis.setex(`ip:${ip}`, 2592000, JSON.stringify(data));
       
-      // AUTO-BAN KALO 5 ATTEMPTS
       if (data.attempts >= 5) {
         await redis.setex(`ban:${ip}`, 2592000, JSON.stringify({
           bannedAt: new Date().toISOString(),
@@ -306,7 +299,6 @@ app.post('/api/verify', async (req, res) => {
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
     
-    // Reset attempts kalo berhasil
     const existing = await redis.get(`ip:${ip}`);
     if (existing) {
       const data = JSON.parse(existing);
@@ -555,7 +547,11 @@ app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
       reason: reason || 'Diblokir oleh admin'
     }));
     
-    res.json({ success: true, message: `✅ IP ${ip} berhasil diblokir.` });
+    res.json({ 
+      success: true, 
+      message: `✅ IP ${ip} berhasil diblokir.`,
+      redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(reason || 'Diblokir oleh admin')}&status=BANNED`
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
