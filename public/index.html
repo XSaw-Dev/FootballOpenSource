@@ -29,12 +29,26 @@
             align-items: center;
             background-image: 
                 url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ffcc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            overflow: hidden;
+        }
+        
+        /* ===== PARTICLE BACKGROUND ===== */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
         
         .container {
             width: 100%;
             max-width: 1000px;
             padding: 20px;
+            position: relative;
+            z-index: 1;
         }
         
         .cyber-card {
@@ -46,23 +60,17 @@
             backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
+            transition: all 0.5s ease;
+            animation: fadeInUp 0.8s ease-out;
         }
         
-        .cyber-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg, transparent, rgba(0, 255, 204, 0.03), transparent, rgba(255, 102, 204, 0.03), transparent);
-            animation: rotateGlow 20s linear infinite;
-            pointer-events: none;
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes rotateGlow {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .cyber-card:hover {
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.2), inset 0 0 60px rgba(0, 255, 204, 0.05);
         }
         
         .cyber-title {
@@ -77,14 +85,12 @@
             letter-spacing: 6px;
             position: relative;
             z-index: 1;
-            animation: glitchText 3s infinite;
+            animation: shimmer 3s ease-in-out infinite;
         }
         
-        @keyframes glitchText {
-            0%, 90%, 100% { transform: translate(0); }
-            92% { transform: translate(-2px, 2px); }
-            94% { transform: translate(2px, -2px); }
-            96% { transform: translate(-1px, 1px); }
+        @keyframes shimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
         }
         
         .cyber-subtitle {
@@ -96,67 +102,83 @@
             margin-bottom: 30px;
             position: relative;
             z-index: 1;
+            animation: pulse 2s infinite;
         }
         
-        .cyber-subtitle span {
-            display: inline-block;
-            animation: blink 2s infinite;
-        }
-        
-        @keyframes blink {
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
         
-        /* ===== VERIFIKASI ===== */
-        #verifySection {
+        /* ===== GATEWAY SECTION ===== */
+        #gatewaySection {
             position: relative;
             z-index: 1;
+            display: block;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .gateway-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .gateway-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+        
+        .gateway-desc {
+            color: rgba(0, 255, 204, 0.3);
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+        }
+        
+        .gateway-status {
+            display: inline-block;
+            padding: 8px 20px;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            border-radius: 30px;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            color: rgba(0, 255, 204, 0.5);
+            margin-bottom: 20px;
+        }
+        
+        .gateway-status.valid {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.1);
+        }
+        
+        .gateway-status.expired {
+            border-color: #ff0044;
+            color: #ff0044;
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.1);
+        }
+        
+        /* ===== VERIFIKASI ===== */
+        #verifySection {
             display: none;
+            position: relative;
+            z-index: 1;
         }
         
         #chatSection {
             display: none;
             position: relative;
             z-index: 1;
-        }
-        
-        #gatewaySection {
-            display: block;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .gateway-box {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .gateway-box .icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.3;
-            animation: pulse 2s infinite;
-        }
-        
-        .gateway-box .title {
-            font-size: 1.5rem;
-            color: var(--neon-green);
-            margin-bottom: 10px;
-            letter-spacing: 4px;
-        }
-        
-        .gateway-box .desc {
-            color: rgba(0, 255, 204, 0.3);
-            font-size: 0.7rem;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-        }
-        
-        .gateway-box .cyber-btn {
-            width: auto;
-            padding: 16px 40px;
-            font-size: 0.8rem;
         }
         
         .input-group {
@@ -170,57 +192,70 @@
             letter-spacing: 3px;
             margin-bottom: 8px;
             text-transform: uppercase;
+            transition: 0.3s;
+        }
+        
+        .input-group:focus-within label {
+            color: var(--neon-green);
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
         }
         
         .cyber-input {
             width: 100%;
             padding: 16px 22px;
-            background: rgba(0, 255, 204, 0.05);
-            border: 2px solid rgba(0, 255, 204, 0.2);
+            background: rgba(0, 255, 204, 0.03);
+            border: 2px solid rgba(0, 255, 204, 0.15);
             border-radius: 14px;
             color: var(--neon-green);
             font-family: 'Orbitron', monospace;
             font-size: 0.9rem;
-            transition: all 0.4s;
+            transition: all 0.4s ease;
         }
         
         .cyber-input:focus {
             outline: none;
             border-color: var(--neon-green);
-            box-shadow: 0 0 40px rgba(0, 255, 204, 0.1);
-            background: rgba(0, 255, 204, 0.08);
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.08);
+            background: rgba(0, 255, 204, 0.06);
+            transform: scale(1.01);
         }
         
         .cyber-input::placeholder {
-            color: rgba(0, 255, 204, 0.2);
+            color: rgba(0, 255, 204, 0.15);
             font-size: 0.7rem;
         }
         
         .captcha-box {
             background: rgba(0, 255, 204, 0.03);
-            border: 2px dashed rgba(0, 255, 204, 0.15);
+            border: 2px dashed rgba(0, 255, 204, 0.1);
             border-radius: 14px;
             padding: 25px;
             text-align: center;
             margin: 15px 0;
-            position: relative;
+            transition: 0.3s;
+        }
+        
+        .captcha-box:hover {
+            border-color: rgba(0, 255, 204, 0.2);
         }
         
         .captcha-box .question {
             font-size: 2.5rem;
             color: var(--neon-green);
-            text-shadow: 0 0 40px rgba(0, 255, 204, 0.2);
+            text-shadow: 0 0 40px rgba(0, 255, 204, 0.1);
             font-weight: 900;
+            animation: pulse 2s infinite;
         }
         
         .captcha-box .hint {
-            color: rgba(0, 255, 204, 0.2);
+            color: rgba(0, 255, 204, 0.15);
             font-size: 0.6rem;
             margin-top: 8px;
             letter-spacing: 2px;
         }
         
         .cyber-btn {
+            width: 100%;
             padding: 18px;
             background: linear-gradient(135deg, var(--neon-green), #00cc99);
             border: none;
@@ -230,7 +265,7 @@
             font-weight: 900;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 4px;
             position: relative;
@@ -244,9 +279,9 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
             transform: rotate(45deg);
-            transition: 0.5s;
+            transition: 0.6s;
         }
         
         .cyber-btn:hover::before {
@@ -254,13 +289,18 @@
         }
         
         .cyber-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 60px rgba(0, 255, 204, 0.3);
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.25);
+        }
+        
+        .cyber-btn:active {
+            transform: scale(0.98);
         }
         
         .cyber-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
         }
         
         /* ===== CHAT ===== */
@@ -269,14 +309,14 @@
             justify-content: space-between;
             align-items: center;
             padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 255, 204, 0.08);
+            border-bottom: 1px solid rgba(0, 255, 204, 0.06);
             margin-bottom: 20px;
             flex-wrap: wrap;
             gap: 10px;
         }
         
         .chat-user {
-            color: rgba(0, 255, 204, 0.5);
+            color: rgba(0, 255, 204, 0.4);
             font-size: 0.7rem;
             letter-spacing: 2px;
         }
@@ -295,7 +335,7 @@
         }
         
         .session-info {
-            color: rgba(0, 255, 204, 0.2);
+            color: rgba(0, 255, 204, 0.15);
             font-size: 0.5rem;
             letter-spacing: 1px;
         }
@@ -308,13 +348,13 @@
         
         .chat-logout {
             background: none;
-            border: 2px solid rgba(255, 0, 68, 0.5);
+            border: 2px solid rgba(255, 0, 68, 0.3);
             color: #ff0044;
             padding: 8px 18px;
             border-radius: 10px;
             font-family: 'Orbitron', monospace;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             font-size: 0.6rem;
             letter-spacing: 2px;
         }
@@ -323,15 +363,16 @@
             background: #ff0044;
             color: #0a0a0f;
             box-shadow: 0 0 30px rgba(255, 0, 68, 0.2);
+            transform: scale(1.05);
         }
         
         #messages {
             height: 420px;
             overflow-y: auto;
             padding: 15px;
-            background: rgba(0, 255, 204, 0.02);
+            background: rgba(0, 255, 204, 0.015);
             border-radius: 14px;
-            border: 1px solid rgba(0, 255, 204, 0.05);
+            border: 1px solid rgba(0, 255, 204, 0.04);
             margin-bottom: 15px;
             position: relative;
         }
@@ -347,22 +388,35 @@
         #messages::-webkit-scrollbar-thumb {
             background: var(--neon-green);
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
         }
         
         .message {
             padding: 12px 18px;
             margin-bottom: 10px;
-            background: rgba(0, 255, 204, 0.04);
+            background: rgba(0, 255, 204, 0.03);
             border-left: 3px solid var(--neon-green);
             border-radius: 8px;
-            animation: slideIn 0.3s ease-out;
-            transition: 0.2s;
+            animation: slideIn 0.4s ease-out;
+            transition: all 0.3s ease;
+            position: relative;
         }
         
         .message:hover {
-            background: rgba(0, 255, 204, 0.08);
-            transform: translateX(4px);
+            background: rgba(0, 255, 204, 0.06);
+            transform: translateX(4px) scale(1.005);
+            border-left-color: var(--neon-pink);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
         }
         
         .message .msg-user {
@@ -378,24 +432,14 @@
             font-size: 0.85rem;
             font-family: 'Segoe UI', sans-serif;
             word-break: break-word;
+            line-height: 1.5;
         }
         
         .message .msg-time {
-            color: rgba(0, 255, 204, 0.15);
+            color: rgba(0, 255, 204, 0.1);
             font-size: 0.5rem;
             float: right;
             letter-spacing: 1px;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
         
         .chat-input-area {
@@ -418,7 +462,7 @@
         }
         
         .typing-indicator {
-            color: rgba(0, 255, 204, 0.2);
+            color: rgba(0, 255, 204, 0.15);
             font-size: 0.6rem;
             padding: 5px 15px;
             letter-spacing: 2px;
@@ -427,12 +471,12 @@
         }
         
         .typing-indicator.active {
-            color: rgba(0, 255, 204, 0.5);
+            color: rgba(0, 255, 204, 0.4);
         }
         
         .empty-chat {
             text-align: center;
-            color: rgba(0, 255, 204, 0.1);
+            color: rgba(0, 255, 204, 0.08);
             padding: 80px 0;
             font-size: 0.8rem;
             letter-spacing: 4px;
@@ -441,14 +485,14 @@
         .empty-chat .icon {
             font-size: 3rem;
             margin-bottom: 15px;
-            opacity: 0.3;
+            opacity: 0.2;
         }
         
         .error {
             color: #ff0044;
             text-align: center;
             padding: 12px;
-            border: 1px solid rgba(255, 0, 68, 0.2);
+            border: 1px solid rgba(255, 0, 68, 0.15);
             border-radius: 10px;
             margin-bottom: 15px;
             display: none;
@@ -456,14 +500,24 @@
             letter-spacing: 1px;
             position: relative;
             z-index: 1;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
         }
         
         .online-count {
-            color: rgba(0, 255, 204, 0.2);
+            color: rgba(0, 255, 204, 0.15);
             font-size: 0.6rem;
             letter-spacing: 2px;
         }
         
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             .cyber-title {
                 font-size: 1.8rem;
@@ -490,30 +544,33 @@
             .captcha-box .question {
                 font-size: 1.8rem;
             }
+            
+            .gateway-title {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- ===== PARTICLE BACKGROUND ===== -->
+<canvas id="particles-canvas"></canvas>
+
 <div class="container">
     <div class="cyber-card">
         <div class="cyber-title">CYBER CHAT</div>
-        <div class="cyber-subtitle"><span>⚡ SECURE • ANONYMOUS • EPHEMERAL ⚡</span></div>
+        <div class="cyber-subtitle">⚡ SECURE • ANONYMOUS • EPHEMERAL ⚡</div>
         
         <div id="errorMsg" class="error"></div>
         
-        <!-- ===== GATEWAY (Pengecekan Cookie) ===== -->
+        <!-- ===== GATEWAY (Auto-check) ===== -->
         <div id="gatewaySection">
-            <div class="gateway-box">
-                <div class="icon">🔐</div>
-                <div class="title">CAPTCHA GATEWAY</div>
-                <div class="desc">✦ VERIFIKASI SESI UNTUK AKSES CHAT ✦</div>
-                <button class="cyber-btn" onclick="checkSession()" id="gatewayBtn">
-                    🚀 VERIFIKASI SESSION
-                </button>
-                <div style="margin-top:15px; color: rgba(0,255,204,0.15); font-size:0.6rem; letter-spacing:1px;">
-                    Cookie akan berlaku 7 hari
-                </div>
+            <div class="gateway-icon">🔐</div>
+            <div class="gateway-title">CAPTCHA GATEWAY</div>
+            <div class="gateway-desc">✦ VERIFIKASI SESI UNTUK AKSES CHAT ✦</div>
+            <div class="gateway-status" id="gatewayStatus">⏳ MEMERIKSA SESSION...</div>
+            <div style="margin-top:15px; color: rgba(0,255,204,0.1); font-size:0.6rem; letter-spacing:1px;">
+                Cookie berlaku 7 hari • Auto-check setiap refresh
             </div>
         </div>
         
@@ -572,16 +629,110 @@
 </div>
 
 <script>
+    // ===== ANTI-DEVTOOLS =====
+    // 1. Blokir F12, Ctrl+Shift+I, Ctrl+U, Ctrl+Shift+C
+    document.addEventListener('keydown', (e) => {
+        if (
+            e.key === 'F12' ||
+            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+            (e.ctrlKey && e.key === 'U')
+        ) {
+            e.preventDefault();
+            showError('⛔ DevTools diblokir untuk keamanan.');
+            return false;
+        }
+    });
+    
+    // 2. Blokir right-click (context menu)
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        showError('⛔ Right-click diblokir.');
+        return false;
+    });
+    
+    // 3. Cek devtools via console.log (deteksi debugger)
+    (function detectDevTools() {
+        let startTime = Date.now();
+        debugger;
+        let endTime = Date.now();
+        if (endTime - startTime > 100) {
+            showError('⛔ DevTools terdeteksi!');
+            document.body.innerHTML = `
+                <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:#0a0a0f;color:#ff0044;font-family:monospace;flex-direction:column;gap:20px;">
+                    <h1 style="font-size:3rem;">⛔</h1>
+                    <p style="font-size:1.5rem;letter-spacing:4px;">DEVELOPER TOOLS DETECTED</p>
+                    <p style="color:rgba(255,0,68,0.3);font-size:0.8rem;">Akses ditolak demi keamanan.</p>
+                </div>
+            `;
+        }
+    })();
+    
+    // ===== PARTICLE SYSTEM =====
+    const canvas = document.getElementById('particles-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.speedY = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.1;
+        }
+        
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            
+            if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 255, 204, ${this.opacity})`;
+            ctx.fill();
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0, 255, 204, 0.1)';
+        }
+    }
+    
+    for (let i = 0; i < 100; i++) {
+        particles.push(new Particle());
+    }
+    
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+    
+    // ===== GLOBAL VARIABLES =====
     let refreshInterval = null;
     let lastMessageCount = 0;
     let sessionValid = false;
     let username = '';
+    let isVerifying = false;
     
-    // ===== CEK SESSION =====
-    async function checkSession() {
-        const btn = document.getElementById('gatewayBtn');
-        btn.disabled = true;
-        btn.textContent = '⏳ CHECKING...';
+    // ===== AUTO CHECK SESSION (TANPA TOMBOL) =====
+    async function autoCheckSession() {
+        const statusEl = document.getElementById('gatewayStatus');
+        statusEl.textContent = '⏳ MEMERIKSA SESSION...';
+        statusEl.className = 'gateway-status';
         
         try {
             const res = await fetch('/api/check-session', {
@@ -595,46 +746,19 @@
                 // Session valid! Langsung masuk chat
                 sessionValid = true;
                 username = data.username;
-                enterChat(username);
+                statusEl.textContent = '✅ SESSION VALID';
+                statusEl.className = 'gateway-status valid';
+                setTimeout(() => enterChat(username), 500);
             } else {
                 // Session expired / ga ada cookie
-                showGateway('expired');
+                statusEl.textContent = '⏳ SESSION EXPIRED';
+                statusEl.className = 'gateway-status expired';
+                setTimeout(() => showVerify(), 800);
             }
         } catch (error) {
-            showError('Error: ' + error.message);
-            showGateway('error');
-        }
-        
-        btn.disabled = false;
-        btn.textContent = '🚀 VERIFIKASI SESSION';
-    }
-    
-    // ===== SHOW GATEWAY STATUS =====
-    function showGateway(status) {
-        const gateway = document.getElementById('gatewaySection');
-        const icon = gateway.querySelector('.icon');
-        const title = gateway.querySelector('.title');
-        const desc = gateway.querySelector('.desc');
-        const btn = document.getElementById('gatewayBtn');
-        
-        if (status === 'expired') {
-            icon.textContent = '⏳';
-            title.textContent = 'SESSION EXPIRED';
-            desc.textContent = '✦ SILAHKAN LOGIN ULANG ✦';
-            btn.textContent = '🔑 LOGIN SEKARANG';
-            btn.onclick = showVerify;
-        } else if (status === 'error') {
-            icon.textContent = '❌';
-            title.textContent = 'ERROR';
-            desc.textContent = '✦ TERJADI KESALAHAN ✦';
-            btn.textContent = '🔄 COBA LAGI';
-            btn.onclick = checkSession;
-        } else {
-            icon.textContent = '🔐';
-            title.textContent = 'CAPTCHA GATEWAY';
-            desc.textContent = '✦ VERIFIKASI SESI UNTUK AKSES CHAT ✦';
-            btn.textContent = '🚀 VERIFIKASI SESSION';
-            btn.onclick = checkSession;
+            statusEl.textContent = '❌ ERROR';
+            statusEl.className = 'gateway-status expired';
+            setTimeout(() => showVerify(), 1000);
         }
     }
     
@@ -673,14 +797,18 @@
         }
     }
     
-    // ===== VERIFIKASI CAPTCHA + USERNAME =====
+    // ===== VERIFIKASI CAPTCHA =====
     async function verifyCaptcha() {
+        if (isVerifying) return;
+        isVerifying = true;
+        
         const username = document.getElementById('telegramUsername').value.trim();
         const answer = document.getElementById('captchaAnswer').value.trim();
         const captchaId = document.getElementById('captchaId').value;
         
         if (!username || !answer) {
             showError('Username dan captcha wajib diisi!');
+            isVerifying = false;
             return;
         }
         
@@ -710,6 +838,7 @@
         
         btn.disabled = false;
         btn.textContent = '🚀 VERIFIKASI';
+        isVerifying = false;
     }
     
     // ===== KIRIM PESAN =====
@@ -849,9 +978,9 @@
     });
     
     // ===== INIT =====
-    // Cek session otomatis saat load
+    // Auto check session saat load
     window.onload = function() {
-        checkSession();
+        autoCheckSession();
     };
 </script>
 </body>
