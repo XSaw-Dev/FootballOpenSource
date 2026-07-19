@@ -1,199 +1,123 @@
 const express = require('express');
 const cors = require('cors');
-const axios = require('axios');
-const cheerio = require('cheerio');
+const cookieParser = require('cookie-parser');
+const { createClient } = require('@vercel/redis');
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(cookieParser());
 
-async function scrapeOkestream() {
-    try {
-        console.log('🔍 Scraping Okestream...');
-        
-        const response = await axios.get('https://okestream.tv/', {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-                'Referer': 'https://okestream.tv/',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
-            },
-            timeout: 20000
-        });
-
-        const html = response.data;
-        const $ = cheerio.load(html);
-        
-        const matches = [];
-        
-        // ===== SELECTOR BARU YANG LEBIH FLEKSIBEL =====
-        
-        // 1. Cari semua div yang punya class mengandung 'match', 'live', 'event'
-        $('div[class*="match"], div[class*="live"], div[class*="event"], div[class*="game"], div[class*="fixture"]').each((i, el) => {
-            const text = $(el).text();
-            
-            // Cari nama tim (pola "Tim A vs Tim B")
-            const vsMatch = text.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/i);
-            const title = vsMatch ? `${vsMatch[1].trim()} vs ${vsMatch[2].trim()}` : null;
-            
-            // Cari liga
-            const leagueMatch = text.match(/(Liga|Premier|La Liga|Serie|Bundesliga|Ligue|Champions|Europa|Indonesia|Pers|PS|Arema|Bali|Borneo|PSS|Barito|Madura|Dewa|Malut|Semen|PSIS|PSM|Persija|Persib|Persebaya)/i);
-            const league = leagueMatch ? leagueMatch[0] : 'Liga Unknown';
-            
-            // Cari link m3u8 di sekitar elemen
-            const parentHtml = $(el).closest('div, section, article').html() || '';
-            const m3u8Match = parentHtml.match(/https?:\/\/[^\s"\']+\.m3u8/);
-            const m3u8Link = m3u8Match ? m3u8Match[0] : null;
-            
-            // Cari iframe
-            const iframe = $(el).find('iframe').attr('src') || 
-                          $(el).closest('div, section, article').find('iframe').attr('src');
-            
-            if (title || m3u8Link || iframe) {
-                matches.push({
-                    id: `match-${Date.now()}-${i}`,
-                    title: title || `Match ${i+1}`,
-                    league: league,
-                    time: 'LIVE',
-                    streamLink: iframe || null,
-                    m3u8Link: m3u8Link || null,
-                    thumbnail: null,
-                    isLive: true
-                });
-            }
-        });
-
-        // 2. Kalo masih kosong, cari semua iframe
-        if (matches.length === 0) {
-            console.log('⚠️ Selector pertama kosong, cari iframe...');
-            
-            $('iframe').each((i, el) => {
-                const src = $(el).attr('src');
-                if (src && (src.includes('m3u8') || src.includes('stream') || src.includes('live'))) {
-                    const parentText = $(el).closest('div, section, article').text().trim();
-                    const vsMatch = parentText.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/i);
-                    
-                    matches.push({
-                        id: `iframe-${i}-${Date.now()}`,
-                        title: vsMatch ? `${vsMatch[1].trim()} vs ${vsMatch[2].trim()}` : `Match ${i+1}`,
-                        league: 'Liga Unknown',
-                        time: 'LIVE',
-                        streamLink: src,
-                        m3u8Link: src.includes('.m3u8') ? src : null,
-                        thumbnail: null,
-                        isLive: true
-                    });
-                }
-            });
-        }
-
-        // 3. Kalo masih kosong, cari semua link yang mengandung stream
-        if (matches.length === 0) {
-            console.log('⚠️ Iframe kosong, cari link stream...');
-            
-            $('a[href*="m3u8"], a[href*="stream"], a[href*="live"]').each((i, el) => {
-                const href = $(el).attr('href');
-                const text = $(el).text().trim() || $(el).closest('div, section, article').text().trim();
-                const vsMatch = text.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/i);
-                
-                matches.push({
-                    id: `link-${i}-${Date.now()}`,
-                    title: vsMatch ? `${vsMatch[1].trim()} vs ${vsMatch[2].trim()}` : `Match ${i+1}`,
-                    league: 'Liga Unknown',
-                    time: 'LIVE',
-                    streamLink: href,
-                    m3u8Link: href.includes('.m3u8') ? href : null,
-                    thumbnail: null,
-                    isLive: true
-                });
-            });
-        }
-
-        console.log(`✅ Dapet ${matches.length} pertandingan`);
-        
-        // Kalo tetep 0, kasih dummy biar web gak kosong
-        if (matches.length === 0) {
-            return getDummyMatches();
-        }
-        
-        return matches;
-
-    } catch (error) {
-        console.error('❌ Error scraping:', error.message);
-        return getDummyMatches();
-    }
-}
-
-// ===== DUMMY DATA (biar web gak kosong) =====
-function getDummyMatches() {
-    return [
-        {
-            id: 'dummy-1',
-            title: 'Persib vs Persija (DUMMY)',
-            league: 'Liga 1 Indonesia',
-            time: 'LIVE',
-            streamLink: null,
-            m3u8Link: 'https://bfff1.hystreamer.com/live/5006838_F5hd01.m3u8',
-            thumbnail: null,
-            isLive: true
-        },
-        {
-            id: 'dummy-2',
-            title: 'Real Madrid vs Barcelona (DUMMY)',
-            league: 'La Liga',
-            time: 'LIVE',
-            streamLink: null,
-            m3u8Link: 'https://bfff1.hystreamer.com/live/5006838_F5hd01.m3u8',
-            thumbnail: null,
-            isLive: true
-        },
-        {
-            id: 'dummy-3',
-            title: 'Manchester City vs Liverpool (DUMMY)',
-            league: 'Premier League',
-            time: 'LIVE',
-            streamLink: null,
-            m3u8Link: 'https://bfff1.hystreamer.com/live/5006838_F5hd01.m3u8',
-            thumbnail: null,
-            isLive: true
-        }
-    ];
-}
-
-// ===== API ENDPOINTS =====
-app.get('/api/matches', async (req, res) => {
-    try {
-        const matches = await scrapeOkestream();
-        res.json({
-            success: true,
-            count: matches.length,
-            matches: matches,
-            timestamp: new Date().toISOString()
-        });
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            error: error.message,
-            matches: getDummyMatches()
-        });
-    }
+const redis = createClient({
+  url: process.env.REDIS_URL
 });
 
-app.get('/api/match/:id', async (req, res) => {
-    try {
-        const matches = await scrapeOkestream();
-        const match = matches.find(m => m.id === req.params.id);
-        
-        if (match) {
-            res.json({ success: true, match });
-        } else {
-            res.status(404).json({ success: false, error: 'Match not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
+// ===== GENERATE CAPTCHA =====
+app.get('/api/captcha', async (req, res) => {
+  const captchaId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+  const num1 = Math.floor(Math.random() * 10) + 1;
+  const num2 = Math.floor(Math.random() * 10) + 1;
+  const answer = num1 + num2;
+  
+  await redis.setex(`captcha:${captchaId}`, 300, answer.toString()); // 5 menit expired
+  
+  res.json({
+    captchaId,
+    question: `${num1} + ${num2} = ?`,
+    image: null // Bisa diganti pake gambar custom kalo mau
+  });
+});
+
+// ===== VERIFIKASI CAPTCHA + USERNAME =====
+app.post('/api/verify', async (req, res) => {
+  const { captchaId, answer, telegramUsername } = req.body;
+  
+  if (!captchaId || !answer || !telegramUsername) {
+    return res.status(400).json({ error: 'Semua field wajib diisi!' });
+  }
+  
+  const correctAnswer = await redis.get(`captcha:${captchaId}`);
+  if (!correctAnswer || correctAnswer !== answer.toString()) {
+    return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
+  }
+  
+  // Generate session cookie (1 jam)
+  const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
+  const expiresAt = Date.now() + 3600000; // 1 jam
+  
+  await redis.setex(`session:${sessionId}`, 3600, JSON.stringify({
+    username: telegramUsername,
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(expiresAt).toISOString()
+  }));
+  
+  res.cookie('sessionId', sessionId, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+    maxAge: 3600000 // 1 jam
+  });
+  
+  res.json({ success: true, message: 'Verifikasi berhasil! Selamat datang.' });
+});
+
+// ===== CEK SESSION (Middleware) =====
+async function checkSession(req, res, next) {
+  const sessionId = req.cookies.sessionId;
+  if (!sessionId) {
+    return res.status(401).json({ error: 'Session expired atau belum login.' });
+  }
+  
+  const sessionData = await redis.get(`session:${sessionId}`);
+  if (!sessionData) {
+    return res.status(401).json({ error: 'Session expired. Verifikasi ulang.' });
+  }
+  
+  req.session = JSON.parse(sessionData);
+  next();
+}
+
+// ===== KIRIM PESAN =====
+app.post('/api/chat/send', checkSession, async (req, res) => {
+  const { message } = req.body;
+  if (!message || message.length > 500) {
+    return res.status(400).json({ error: 'Pesan maksimal 500 karakter.' });
+  }
+  
+  const chatId = 'global';
+  const chatKey = `chat:${chatId}`;
+  const chatData = await redis.lrange(chatKey, 0, -1);
+  
+  const newMessage = {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+    username: req.session.username,
+    message: message,
+    timestamp: new Date().toISOString()
+  };
+  
+  // Simpan ke Redis, auto-expire 1 jam
+  await redis.rpush(chatKey, JSON.stringify(newMessage));
+  await redis.expire(chatKey, 3600); // 1 jam auto-delete
+  
+  res.json({ success: true, message: newMessage });
+});
+
+// ===== AMBIL PESAN =====
+app.get('/api/chat/messages', checkSession, async (req, res) => {
+  const chatKey = 'chat:global';
+  const messages = await redis.lrange(chatKey, 0, -1);
+  
+  res.json({
+    success: true,
+    messages: messages.map(msg => JSON.parse(msg)),
+    count: messages.length
+  });
+});
+
+// ===== LOGOUT (Hapus Cookie) =====
+app.post('/api/logout', (req, res) => {
+  res.clearCookie('sessionId');
+  res.json({ success: true, message: 'Logout berhasil.' });
 });
 
 module.exports = app;
