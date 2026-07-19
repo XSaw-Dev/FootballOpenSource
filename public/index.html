@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚽ OKESTREAM TV - I7ZX EDITION</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a1a;
+            color: white;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a3e, #2d1b69);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #e94560;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, #e94560, #f1c40f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: #aaa;
+            margin-top: 5px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: #1a1a2e;
+            padding: 15px 20px;
+            border-radius: 12px;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 2px solid #2d1b69;
+            background: #0a0a1a;
+            color: white;
+            font-size: 1rem;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        .btn-refresh {
+            padding: 12px 25px;
+            background: #e94560;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-refresh:hover {
+            transform: scale(1.05);
+            background: #ff6b81;
+        }
+        .match-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .match-card {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid #2d1b69;
+            cursor: pointer;
+        }
+        .match-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+            border-color: #e94560;
+        }
+        .match-card .live-badge {
+            background: #e94560;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .match-card .card-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d1b69;
+        }
+        .match-card .card-body {
+            padding: 20px;
+        }
+        .match-card .title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .match-card .league {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .match-card .time {
+            color: #f1c40f;
+            font-size: 0.9rem;
+        }
+        .match-card .watch-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e94560;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+        .match-card .watch-btn:hover {
+            background: #ff6b81;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5rem;
+        }
+        .loading .spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 4px solid #2d1b69;
+            border-top: 4px solid #e94560;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Player */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(5px);
+        }
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 16px;
+            max-width: 1000px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: hidden;
+            position: relative;
+        }
+        .modal-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2d1b69;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-body video, .modal-body iframe {
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            background: #000;
+        }
+        .modal-body .info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #0a0a1a;
+            border-radius: 8px;
+        }
+        .no-matches {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>⚽ OKESTREAM TV - I7ZX EDITION</h1>
+    <p>Streaming pertandingan langsung tanpa iklan 🔥</p>
+</div>
+
+<div class="container">
+    <div class="controls">
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Cari pertandingan...">
+        <button class="btn-refresh" onclick="loadMatches()">🔄 Refresh</button>
+        <span id="matchCount" style="color: #aaa;">0 pertandingan</span>
+    </div>
+
+    <div id="matchContainer">
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>🔍 Memuat daftar pertandingan...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Player -->
+<div class="modal" id="playerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Pertandingan</h3>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="playerContainer">
+                <p style="text-align:center; color:#666;">Memuat stream...</p>
+            </div>
+            <div class="info" id="matchInfo">
+                <p><strong>Liga:</strong> <span id="modalLeague">-</span></p>
+                <p><strong>Waktu:</strong> <span id="modalTime">-</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allMatches = [];
+
+    // ===== LOAD MATCHES =====
+    async function loadMatches() {
+        const container = document.getElementById('matchContainer');
+        container.innerHTML = `
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>🔍 Memuat daftar pertandingan...</p>
+            </div>
+        `;
+
+        try {
+            const response = await fetch('/api/matches');
+            const data = await response.json();
+            
+            if (data.success) {
+                allMatches = data.matches;
+                renderMatches(allMatches);
+                document.getElementById('matchCount').textContent = `${allMatches.length} pertandingan`;
+            } else {
+                container.innerHTML = `<div class="no-matches">❌ Gagal memuat data: ${data.error}</div>`;
+            }
+        } catch (error) {
+            container.innerHTML = `<div class="no-matches">❌ Error: ${error.message}</div>`;
+        }
+    }
+
+    // ===== RENDER MATCHES =====
+    function renderMatches(matches) {
+        const container = document.getElementById('matchContainer');
+        
+        if (matches.length === 0) {
+            container.innerHTML = `<div class="no-matches">😴 Tidak ada pertandingan saat ini</div>`;
+            return;
+        }
+
+        let html = '<div class="match-grid">';
+        matches.forEach(match => {
+            html += `
+                <div class="match-card" onclick="openMatch('${match.id}')">
+                    <div class="card-header">
+                        <span class="live-badge">🔴 LIVE</span>
+                        <span class="time">${match.time || 'LIVE'}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="title">${match.title}</div>
+                        <div class="league">🏆 ${match.league || 'Liga Unknown'}</div>
+                        ${match.m3u8Link ? '<div style="color:#2ecc71; font-size:0.8rem; margin-top:5px;">✅ Stream tersedia</div>' : '<div style="color:#e74c3c; font-size:0.8rem; margin-top:5px;">⚠️ Stream tidak tersedia</div>'}
+                        <button class="watch-btn">▶️ Tonton Sekarang</button>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    // ===== SEARCH =====
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const query = e.target.value.toLowerCase();
+        const filtered = allMatches.filter(m => 
+            m.title.toLowerCase().includes(query) || 
+            (m.league && m.league.toLowerCase().includes(query))
+        );
+        renderMatches(filtered);
+        document.getElementById('matchCount').textContent = `${filtered.length} pertandingan`;
+    });
+
+    // ===== OPEN MATCH =====
+    async function openMatch(matchId) {
+        const modal = document.getElementById('playerModal');
+        const container = document.getElementById('playerContainer');
+        const title = document.getElementById('modalTitle');
+        const league = document.getElementById('modalLeague');
+        const time = document.getElementById('modalTime');
+
+        try {
+            const response = await fetch(`/api/match/${matchId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                const match = data.match;
+                title.textContent = match.title;
+                league.textContent = match.league || 'Liga Unknown';
+                time.textContent = match.time || 'LIVE';
+
+                // Tampilkan player
+                if (match.m3u8Link) {
+                    container.innerHTML = `
+                        <video id="videoPlayer" controls autoplay>
+                            <source src="${match.m3u8Link}" type="application/vnd.apple.mpegurl">
+                            Browser Anda tidak mendukung video.
+                        </video>
+                        <p style="color:#aaa; font-size:0.8rem; margin-top:8px;">
+                            🔗 ${match.m3u8Link}
+                        </p>
+                    `;
+                    
+                    // Coba play pake HLS.js (kalo browser support)
+                    if (Hls && Hls.isSupported()) {
+                        const video = document.getElementById('videoPlayer');
+                        const hls = new Hls();
+                        hls.loadSource(match.m3u8Link);
+                        hls.attachMedia(video);
+                        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    }
+                } else if (match.streamLink) {
+                    container.innerHTML = `
+                        <iframe src="${match.streamLink}" allowfullscreen></iframe>
+                    `;
+                } else {
+                    container.innerHTML = `<p style="color:#e74c3c;">❌ Link streaming tidak tersedia untuk pertandingan ini.</p>`;
+                }
+
+                modal.classList.add('active');
+            }
+        } catch (error) {
+            container.innerHTML = `<p style="color:#e74c3c;">❌ Error: ${error.message}</p>`;
+        }
+    }
+
+    // ===== CLOSE MODAL =====
+    function closeModal() {
+        document.getElementById('playerModal').classList.remove('active');
+        const video = document.getElementById('videoPlayer');
+        if (video) video.pause();
+        document.getElementById('playerContainer').innerHTML = '<p style="text-align:center; color:#666;">Memuat stream...</p>';
+    }
+
+    // ===== LOAD ON START =====
+    loadMatches();
+
+    // Auto refresh tiap 60 detik
+    setInterval(loadMatches, 60000);
+
+    // HLS.js CDN (kalo perlu)
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
+    document.head.appendChild(script);
+</script>
+
+</body>
+  </html>
