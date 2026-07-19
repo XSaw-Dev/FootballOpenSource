@@ -8,7 +8,7 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// ===== KONEKSI REDIS PAKE IOREDIS =====
+// ===== KONEKSI REDIS =====
 const redis = new Redis({
   host: 'cosmic-moose-166150.upstash.io',
   port: 6379,
@@ -19,6 +19,34 @@ const redis = new Redis({
 
 redis.on('error', (err) => console.error('❌ Redis Error:', err));
 redis.on('connect', () => console.log('✅ Redis Connected!'));
+
+// ===== CEK SESSION (Middleware) =====
+async function checkSession(req, res, next) {
+  try {
+    const sessionId = req.cookies.sessionId;
+    
+    if (!sessionId) {
+      return res.status(401).json({ 
+        error: 'NO_SESSION',
+        message: 'Belum login atau session expired.'
+      });
+    }
+    
+    const sessionData = await redis.get(`session:${sessionId}`);
+    if (!sessionData) {
+      res.clearCookie('sessionId');
+      return res.status(401).json({ 
+        error: 'SESSION_EXPIRED',
+        message: 'Session expired. Verifikasi ulang.'
+      });
+    }
+    
+    req.session = JSON.parse(sessionData);
+    next();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 // ===== GENERATE CAPTCHA =====
 app.get('/api/captcha', async (req, res) => {
@@ -54,70 +82,79 @@ app.post('/api/verify', async (req, res) => {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
     
-    // Fallback auto-pass
+    // Cek captcha
+    let verified = false;
+    
     if (captchaId.startsWith('fallback-')) {
-      const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
-      
-      await redis.setex(`session:${sessionId}`, 3600, JSON.stringify({
-        username: telegramUsername,
-        createdAt: new Date().toISOString()
-      }));
-      
-      res.cookie('sessionId', sessionId, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 3600000
-      });
-      
-      return res.json({ success: true, message: 'Verifikasi berhasil!' });
+      verified = true;
+    } else {
+      const correctAnswer = await redis.get(`captcha:${captchaId}`);
+      if (correctAnswer && correctAnswer === answer.toString()) {
+        verified = true;
+      }
     }
     
-    const correctAnswer = await redis.get(`captcha:${captchaId}`);
-    if (!correctAnswer || correctAnswer !== answer.toString()) {
+    if (!verified) {
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
     
+    // Generate session (valid 7 hari!)
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
+    const expiresIn = 7 * 24 * 3600; // 7 hari dalam detik
     
-    await redis.setex(`session:${sessionId}`, 3600, JSON.stringify({
+    await redis.setex(`session:${sessionId}`, expiresIn, JSON.stringify({
       username: telegramUsername,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString()
     }));
     
     res.cookie('sessionId', sessionId, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: 3600000
+      maxAge: expiresIn * 1000 // 7 hari dalam milidetik
     });
     
-    res.json({ success: true, message: 'Verifikasi berhasil!' });
+    res.json({ success: true, message: 'Verifikasi berhasil! Session berlaku 7 hari.' });
   } catch (error) {
     console.error('❌ Verify error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== MIDDLEWARE CEK SESSION =====
-async function checkSession(req, res, next) {
+// ===== CEK SESSION (buat frontend) =====
+app.get('/api/check-session', async (req, res) => {
   try {
     const sessionId = req.cookies.sessionId;
+    
     if (!sessionId) {
-      return res.status(401).json({ error: 'Session expired atau belum login.' });
+      return res.json({ 
+        valid: false, 
+        error: 'NO_SESSION',
+        message: 'Belum login' 
+      });
     }
     
     const sessionData = await redis.get(`session:${sessionId}`);
     if (!sessionData) {
-      return res.status(401).json({ error: 'Session expired. Verifikasi ulang.' });
+      res.clearCookie('sessionId');
+      return res.json({ 
+        valid: false, 
+        error: 'SESSION_EXPIRED',
+        message: 'Session expired' 
+      });
     }
     
-    req.session = JSON.parse(sessionData);
-    next();
+    const session = JSON.parse(sessionData);
+    res.json({ 
+      valid: true, 
+      username: session.username,
+      expiresAt: session.expiresAt
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+});
 
 // ===== KIRIM PESAN =====
 app.post('/api/chat/send', checkSession, async (req, res) => {
@@ -162,18 +199,16 @@ app.get('/api/chat/messages', checkSession, async (req, res) => {
 });
 
 // ===== LOGOUT =====
-app.post('/api/logout', (req, res) => {
-  res.clearCookie('sessionId');
-  res.json({ success: true, message: 'Logout berhasil.' });
-});
-
-// ===== TEST REDIS =====
-app.get('/api/ping', async (req, res) => {
+app.post('/api/logout', async (req, res) => {
   try {
-    const pong = await redis.ping();
-    res.json({ status: '✅ Redis Connected!', pong });
+    const sessionId = req.cookies.sessionId;
+    if (sessionId) {
+      await redis.del(`session:${sessionId}`);
+    }
+    res.clearCookie('sessionId');
+    res.json({ success: true, message: 'Logout berhasil.' });
   } catch (error) {
-    res.status(500).json({ status: '❌ Redis Error', error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
