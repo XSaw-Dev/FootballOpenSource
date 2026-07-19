@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const Redis = require('ioredis');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
@@ -20,7 +21,40 @@ const redis = new Redis({
 redis.on('error', (err) => console.error('❌ Redis Error:', err));
 redis.on('connect', () => console.log('✅ Redis Connected!'));
 
-// ===== CEK SESSION (Middleware) =====
+// ===== RATE LIMITER =====
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: 100, // 100 request per IP
+  message: { error: '⛔ Terlalu banyak request. Coba lagi nanti.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use('/api/', limiter);
+
+// ===== AUTO BLOCK IP (Brute Force Protection) =====
+const blockedIPs = new Map(); // IP → { attempts, blockUntil }
+
+async function checkBlocked(req, res, next) {
+  const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+  
+  const blockData = blockedIPs.get(ip);
+  if (blockData && blockData.blockUntil > Date.now()) {
+    return res.status(403).json({ 
+      error: '⛔ IP diblokir sementara. Coba lagi nanti.',
+      blockUntil: new Date(blockData.blockUntil).toISOString()
+    });
+  }
+  
+  // Log request (untuk deteksi mencurigakan)
+  console.log(`[${new Date().toISOString()}] ${ip} - ${req.method} ${req.path}`);
+  
+  next();
+}
+
+app.use(checkBlocked);
+
+// ===== MIDDLEWARE CEK SESSION =====
 async function checkSession(req, res, next) {
   try {
     const sessionId = req.cookies.sessionId;
@@ -37,7 +71,7 @@ async function checkSession(req, res, next) {
       res.clearCookie('sessionId');
       return res.status(401).json({ 
         error: 'SESSION_EXPIRED',
-        message: 'Session expired. Verifikasi ulang.'
+        message: 'Session expired. Silahkan login ulang.'
       });
     }
     
@@ -75,6 +109,8 @@ app.get('/api/captcha', async (req, res) => {
 
 // ===== VERIFIKASI CAPTCHA + USERNAME =====
 app.post('/api/verify', async (req, res) => {
+  const ip = req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress;
+  
   try {
     const { captchaId, answer, telegramUsername } = req.body;
     
@@ -95,12 +131,29 @@ app.post('/api/verify', async (req, res) => {
     }
     
     if (!verified) {
+      // Tambahin attempt gagal
+      const blockData = blockedIPs.get(ip) || { attempts: 0, blockUntil: 0 };
+      blockData.attempts += 1;
+      
+      if (blockData.attempts >= 5) {
+        blockData.blockUntil = Date.now() + 300000; // 5 menit
+        blockedIPs.set(ip, blockData);
+        return res.status(429).json({ 
+          error: '⛔ Terlalu banyak percobaan. IP diblokir 5 menit.',
+          blockUntil: new Date(blockData.blockUntil).toISOString()
+        });
+      }
+      
+      blockedIPs.set(ip, blockData);
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
     
-    // Generate session (valid 7 hari!)
+    // Reset attempts kalo berhasil
+    blockedIPs.delete(ip);
+    
+    // Generate session (7 hari)
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
-    const expiresIn = 7 * 24 * 3600; // 7 hari dalam detik
+    const expiresIn = 7 * 24 * 3600; // 7 hari
     
     await redis.setex(`session:${sessionId}`, expiresIn, JSON.stringify({
       username: telegramUsername,
@@ -112,17 +165,17 @@ app.post('/api/verify', async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: expiresIn * 1000 // 7 hari dalam milidetik
+      maxAge: expiresIn * 1000
     });
     
-    res.json({ success: true, message: 'Verifikasi berhasil! Session berlaku 7 hari.' });
+    res.json({ success: true, message: '✅ Verifikasi berhasil! Session 7 hari.' });
   } catch (error) {
     console.error('❌ Verify error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
-// ===== CEK SESSION (buat frontend) =====
+// ===== CEK SESSION (Auto-check) =====
 app.get('/api/check-session', async (req, res) => {
   try {
     const sessionId = req.cookies.sessionId;
