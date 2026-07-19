@@ -3,61 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CYBER CHAT - I7ZX EDITION</title>
+    <title>⚡ CYBER CHAT 2.0</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #14141f;
+            --neon-green: #00ffcc;
+            --neon-pink: #ff66cc;
+            --neon-blue: #4d7aff;
+            --neon-yellow: #ffe066;
+            --glow-green: 0 0 30px rgba(0, 255, 204, 0.15);
+        }
+        
         body {
             font-family: 'Orbitron', monospace;
-            background: #0a0a0f;
-            color: #00ffcc;
+            background: var(--bg-primary);
+            color: var(--neon-green);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             background-image: 
-                radial-gradient(ellipse at 10% 20%, rgba(0, 255, 204, 0.05) 0%, transparent 50%),
-                radial-gradient(ellipse at 90% 80%, rgba(255, 0, 128, 0.05) 0%, transparent 50%);
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2300ffcc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
             padding: 20px;
         }
         
         .cyber-card {
-            background: rgba(10, 10, 20, 0.9);
-            border: 2px solid #00ffcc;
-            border-radius: 20px;
+            background: rgba(10, 10, 20, 0.92);
+            border: 2px solid var(--neon-green);
+            border-radius: 24px;
             padding: 30px;
-            box-shadow: 0 0 40px rgba(0, 255, 204, 0.15), inset 0 0 40px rgba(0, 255, 204, 0.05);
-            backdrop-filter: blur(10px);
+            box-shadow: var(--glow-green), inset 0 0 40px rgba(0, 255, 204, 0.03);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 255, 204, 0.03), transparent, rgba(255, 102, 204, 0.03), transparent);
+            animation: rotateGlow 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .cyber-title {
             text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #00ffcc;
-            text-shadow: 0 0 20px rgba(0, 255, 204, 0.5), 0 0 60px rgba(0, 255, 204, 0.2);
-            margin-bottom: 10px;
-            letter-spacing: 4px;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-green), var(--neon-pink), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            margin-bottom: 5px;
+            letter-spacing: 6px;
+            position: relative;
+            z-index: 1;
+            animation: glitchText 3s infinite;
+        }
+        
+        @keyframes glitchText {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-1px, 1px); }
         }
         
         .cyber-subtitle {
             text-align: center;
-            color: #66ffdd;
-            font-size: 0.8rem;
-            letter-spacing: 6px;
-            opacity: 0.7;
+            color: rgba(0, 255, 204, 0.5);
+            font-size: 0.7rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
             margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
         }
         
-        #verifySection { display: block; }
-        #chatSection { display: none; }
+        .cyber-subtitle span {
+            display: inline-block;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* ===== VERIFIKASI ===== */
+        #verifySection {
+            position: relative;
+            z-index: 1;
+            display: none;
+        }
+        
+        #chatSection {
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+        
+        #gatewaySection {
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .gateway-box {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .gateway-box .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+            animation: pulse 2s infinite;
+        }
+        
+        .gateway-box .title {
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            letter-spacing: 4px;
+        }
+        
+        .gateway-box .desc {
+            color: rgba(0, 255, 204, 0.3);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+        }
+        
+        .gateway-box .cyber-btn {
+            width: auto;
+            padding: 16px 40px;
+            font-size: 0.8rem;
+        }
         
         .input-group {
             margin-bottom: 20px;
@@ -65,69 +165,97 @@
         
         .input-group label {
             display: block;
-            color: #66ffdd;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
+            color: rgba(0, 255, 204, 0.7);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
             margin-bottom: 8px;
             text-transform: uppercase;
         }
         
         .cyber-input {
             width: 100%;
-            padding: 15px 20px;
+            padding: 16px 22px;
             background: rgba(0, 255, 204, 0.05);
-            border: 2px solid #00ffcc;
-            border-radius: 12px;
-            color: #00ffcc;
+            border: 2px solid rgba(0, 255, 204, 0.2);
+            border-radius: 14px;
+            color: var(--neon-green);
             font-family: 'Orbitron', monospace;
-            font-size: 1rem;
-            transition: all 0.3s;
+            font-size: 0.9rem;
+            transition: all 0.4s;
         }
         
         .cyber-input:focus {
             outline: none;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.2);
-            background: rgba(0, 255, 204, 0.1);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.1);
+            background: rgba(0, 255, 204, 0.08);
         }
         
         .cyber-input::placeholder {
-            color: rgba(0, 255, 204, 0.3);
+            color: rgba(0, 255, 204, 0.2);
+            font-size: 0.7rem;
         }
         
         .captcha-box {
-            background: rgba(0, 255, 204, 0.05);
-            border: 2px dashed #00ffcc;
-            border-radius: 12px;
-            padding: 20px;
+            background: rgba(0, 255, 204, 0.03);
+            border: 2px dashed rgba(0, 255, 204, 0.15);
+            border-radius: 14px;
+            padding: 25px;
             text-align: center;
             margin: 15px 0;
+            position: relative;
         }
         
         .captcha-box .question {
-            font-size: 2rem;
-            color: #00ffcc;
-            text-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+            font-size: 2.5rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 40px rgba(0, 255, 204, 0.2);
+            font-weight: 900;
+        }
+        
+        .captcha-box .hint {
+            color: rgba(0, 255, 204, 0.2);
+            font-size: 0.6rem;
+            margin-top: 8px;
+            letter-spacing: 2px;
         }
         
         .cyber-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #00ffcc, #00cc99);
+            padding: 18px;
+            background: linear-gradient(135deg, var(--neon-green), #00cc99);
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             color: #0a0a0f;
             font-family: 'Orbitron', monospace;
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 900;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+        
+        .cyber-btn:hover::before {
+            left: 100%;
         }
         
         .cyber-btn:hover {
             transform: scale(1.02);
-            box-shadow: 0 0 40px rgba(0, 255, 204, 0.4);
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.3);
         }
         
         .cyber-btn:disabled {
@@ -135,139 +263,233 @@
             cursor: not-allowed;
         }
         
+        /* ===== CHAT ===== */
         .chat-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding-bottom: 15px;
-            border-bottom: 1px solid rgba(0, 255, 204, 0.2);
+            border-bottom: 1px solid rgba(0, 255, 204, 0.08);
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .chat-user {
-            color: #66ffdd;
-            font-size: 0.8rem;
+            color: rgba(0, 255, 204, 0.5);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
         }
         
         .chat-user span {
-            color: #00ffcc;
+            color: var(--neon-pink);
             font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .status-online {
+            color: var(--neon-green);
+            font-size: 0.6rem;
+            animation: pulse 2s infinite;
+            letter-spacing: 2px;
+        }
+        
+        .session-info {
+            color: rgba(0, 255, 204, 0.2);
+            font-size: 0.5rem;
+            letter-spacing: 1px;
+        }
+        
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
         
         .chat-logout {
             background: none;
-            border: 2px solid #ff0044;
+            border: 2px solid rgba(255, 0, 68, 0.5);
             color: #ff0044;
             padding: 8px 18px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-family: 'Orbitron', monospace;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 0.7rem;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
         }
         
         .chat-logout:hover {
             background: #ff0044;
             color: #0a0a0f;
-            box-shadow: 0 0 30px rgba(255, 0, 68, 0.3);
+            box-shadow: 0 0 30px rgba(255, 0, 68, 0.2);
         }
         
         #messages {
-            height: 400px;
+            height: 420px;
             overflow-y: auto;
-            padding: 10px;
+            padding: 15px;
             background: rgba(0, 255, 204, 0.02);
-            border-radius: 12px;
-            border: 1px solid rgba(0, 255, 204, 0.1);
+            border-radius: 14px;
+            border: 1px solid rgba(0, 255, 204, 0.05);
             margin-bottom: 15px;
+            position: relative;
         }
         
         #messages::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         
         #messages::-webkit-scrollbar-track {
-            background: rgba(0, 255, 204, 0.05);
+            background: rgba(0, 255, 204, 0.02);
         }
         
         #messages::-webkit-scrollbar-thumb {
-            background: #00ffcc;
+            background: var(--neon-green);
             border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
         }
         
         .message {
-            padding: 10px 15px;
+            padding: 12px 18px;
             margin-bottom: 10px;
-            background: rgba(0, 255, 204, 0.05);
-            border-left: 3px solid #00ffcc;
-            border-radius: 6px;
-            animation: fadeIn 0.3s;
+            background: rgba(0, 255, 204, 0.04);
+            border-left: 3px solid var(--neon-green);
+            border-radius: 8px;
+            animation: slideIn 0.3s ease-out;
+            transition: 0.2s;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .message:hover {
+            background: rgba(0, 255, 204, 0.08);
+            transform: translateX(4px);
         }
         
         .message .msg-user {
-            color: #ff66cc;
+            color: var(--neon-pink);
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             margin-bottom: 4px;
+            letter-spacing: 1px;
         }
         
         .message .msg-text {
-            color: #ccffdd;
-            font-size: 0.9rem;
+            color: #e0e8f0;
+            font-size: 0.85rem;
+            font-family: 'Segoe UI', sans-serif;
+            word-break: break-word;
         }
         
         .message .msg-time {
-            color: rgba(0, 255, 204, 0.3);
-            font-size: 0.6rem;
+            color: rgba(0, 255, 204, 0.15);
+            font-size: 0.5rem;
             float: right;
+            letter-spacing: 1px;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
         
         .chat-input-area {
             display: flex;
             gap: 10px;
+            position: relative;
         }
         
         .chat-input-area .cyber-input {
             flex: 1;
+            padding: 14px 20px;
+            font-size: 0.8rem;
         }
         
         .chat-input-area .cyber-btn {
             width: auto;
-            padding: 15px 30px;
-            font-size: 0.8rem;
+            padding: 14px 30px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+        }
+        
+        .typing-indicator {
+            color: rgba(0, 255, 204, 0.2);
+            font-size: 0.6rem;
+            padding: 5px 15px;
+            letter-spacing: 2px;
+            height: 20px;
+            transition: 0.3s;
+        }
+        
+        .typing-indicator.active {
+            color: rgba(0, 255, 204, 0.5);
         }
         
         .empty-chat {
             text-align: center;
-            color: rgba(0, 255, 204, 0.3);
-            padding: 50px 0;
-            font-size: 0.9rem;
+            color: rgba(0, 255, 204, 0.1);
+            padding: 80px 0;
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+        }
+        
+        .empty-chat .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
         }
         
         .error {
             color: #ff0044;
             text-align: center;
-            padding: 10px;
-            border: 1px solid #ff0044;
-            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid rgba(255, 0, 68, 0.2);
+            border-radius: 10px;
             margin-bottom: 15px;
             display: none;
-        }
-        
-        .status-online {
-            color: #00ffcc;
             font-size: 0.7rem;
-            animation: pulse 2s infinite;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        .online-count {
+            color: rgba(0, 255, 204, 0.2);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+        }
+        
+        @media (max-width: 600px) {
+            .cyber-title {
+                font-size: 1.8rem;
+                letter-spacing: 3px;
+            }
+            
+            .cyber-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+            
+            #messages {
+                height: 300px;
+            }
+            
+            .chat-input-area {
+                flex-direction: column;
+            }
+            
+            .chat-input-area .cyber-btn {
+                width: 100%;
+            }
+            
+            .captcha-box .question {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
@@ -276,25 +498,43 @@
 <div class="container">
     <div class="cyber-card">
         <div class="cyber-title">CYBER CHAT</div>
-        <div class="cyber-subtitle">⚡ SECURE • ANONYMOUS • EPHEMERAL ⚡</div>
+        <div class="cyber-subtitle"><span>⚡ SECURE • ANONYMOUS • EPHEMERAL ⚡</span></div>
         
         <div id="errorMsg" class="error"></div>
         
-        <!-- ===== VERIFIKASI ===== -->
+        <!-- ===== GATEWAY (Pengecekan Cookie) ===== -->
+        <div id="gatewaySection">
+            <div class="gateway-box">
+                <div class="icon">🔐</div>
+                <div class="title">CAPTCHA GATEWAY</div>
+                <div class="desc">✦ VERIFIKASI SESI UNTUK AKSES CHAT ✦</div>
+                <button class="cyber-btn" onclick="checkSession()" id="gatewayBtn">
+                    🚀 VERIFIKASI SESSION
+                </button>
+                <div style="margin-top:15px; color: rgba(0,255,204,0.15); font-size:0.6rem; letter-spacing:1px;">
+                    Cookie akan berlaku 7 hari
+                </div>
+            </div>
+        </div>
+        
+        <!-- ===== VERIFIKASI (Login + Captcha) ===== -->
         <div id="verifySection">
             <div class="input-group">
-                <label>👤 Username Telegram</label>
-                <input type="text" id="telegramUsername" class="cyber-input" placeholder="Masukkan username Telegrammu..." required>
+                <label>👤 USERNAME TELEGRAM</label>
+                <input type="text" id="telegramUsername" class="cyber-input" placeholder="Masukkan username Telegram..." required>
             </div>
             
             <div class="input-group">
-                <label>🔐 Verifikasi Captcha</label>
+                <label>🔐 VERIFIKASI CAPTCHA</label>
                 <div class="captcha-box">
                     <div class="question" id="captchaQuestion">Loading...</div>
+                    <div class="hint">✦ VERIFIKASI MANUSIA ✦</div>
                 </div>
-                <input type="text" id="captchaAnswer" class="cyber-input" placeholder="Masukkan hasil penjumlahan..." required>
+                <input type="text" id="captchaAnswer" class="cyber-input" placeholder="Masukkan hasil penjumlahan..." required style="margin-top:10px;">
                 <input type="hidden" id="captchaId">
-                <button class="cyber-btn" onclick="verifyCaptcha()" style="margin-top:10px;">🚀 VERIFIKASI</button>
+                <button class="cyber-btn" onclick="verifyCaptcha()" style="margin-top:15px;" id="verifyBtn">
+                    🚀 VERIFIKASI
+                </button>
             </div>
         </div>
         
@@ -304,13 +544,23 @@
                 <div>
                     <div class="chat-user">👤 <span id="currentUser">-</span></div>
                     <div class="status-online">● ONLINE</div>
+                    <div class="session-info" id="sessionInfo">Session: 7 hari</div>
                 </div>
-                <button class="chat-logout" onclick="logout()">⛔ KELUAR</button>
+                <div class="chat-actions">
+                    <span class="online-count" id="onlineCount">👥 0 online</span>
+                    <button class="chat-logout" onclick="logout()">⛔ KELUAR</button>
+                </div>
             </div>
             
             <div id="messages">
-                <div class="empty-chat">💬 Belum ada pesan. Mulai chatting!</div>
+                <div class="empty-chat">
+                    <div class="icon">💬</div>
+                    BELUM ADA PESAN<br>
+                    <span style="font-size:0.6rem;opacity:0.5;">MULAI CHATTING!</span>
+                </div>
             </div>
+            
+            <div class="typing-indicator" id="typingIndicator">✎ ...</div>
             
             <div class="chat-input-area">
                 <input type="text" id="chatInput" class="cyber-input" placeholder="Ketik pesan..." maxlength="500">
@@ -323,6 +573,88 @@
 
 <script>
     let refreshInterval = null;
+    let lastMessageCount = 0;
+    let sessionValid = false;
+    let username = '';
+    
+    // ===== CEK SESSION =====
+    async function checkSession() {
+        const btn = document.getElementById('gatewayBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ CHECKING...';
+        
+        try {
+            const res = await fetch('/api/check-session', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            
+            const data = await res.json();
+            
+            if (data.valid) {
+                // Session valid! Langsung masuk chat
+                sessionValid = true;
+                username = data.username;
+                enterChat(username);
+            } else {
+                // Session expired / ga ada cookie
+                showGateway('expired');
+            }
+        } catch (error) {
+            showError('Error: ' + error.message);
+            showGateway('error');
+        }
+        
+        btn.disabled = false;
+        btn.textContent = '🚀 VERIFIKASI SESSION';
+    }
+    
+    // ===== SHOW GATEWAY STATUS =====
+    function showGateway(status) {
+        const gateway = document.getElementById('gatewaySection');
+        const icon = gateway.querySelector('.icon');
+        const title = gateway.querySelector('.title');
+        const desc = gateway.querySelector('.desc');
+        const btn = document.getElementById('gatewayBtn');
+        
+        if (status === 'expired') {
+            icon.textContent = '⏳';
+            title.textContent = 'SESSION EXPIRED';
+            desc.textContent = '✦ SILAHKAN LOGIN ULANG ✦';
+            btn.textContent = '🔑 LOGIN SEKARANG';
+            btn.onclick = showVerify;
+        } else if (status === 'error') {
+            icon.textContent = '❌';
+            title.textContent = 'ERROR';
+            desc.textContent = '✦ TERJADI KESALAHAN ✦';
+            btn.textContent = '🔄 COBA LAGI';
+            btn.onclick = checkSession;
+        } else {
+            icon.textContent = '🔐';
+            title.textContent = 'CAPTCHA GATEWAY';
+            desc.textContent = '✦ VERIFIKASI SESI UNTUK AKSES CHAT ✦';
+            btn.textContent = '🚀 VERIFIKASI SESSION';
+            btn.onclick = checkSession;
+        }
+    }
+    
+    // ===== SHOW VERIFIKASI =====
+    function showVerify() {
+        document.getElementById('gatewaySection').style.display = 'none';
+        document.getElementById('verifySection').style.display = 'block';
+        loadCaptcha();
+    }
+    
+    // ===== ENTER CHAT =====
+    function enterChat(username) {
+        document.getElementById('gatewaySection').style.display = 'none';
+        document.getElementById('verifySection').style.display = 'none';
+        document.getElementById('chatSection').style.display = 'block';
+        document.getElementById('currentUser').textContent = username;
+        document.getElementById('sessionInfo').textContent = 'Session: 7 hari';
+        loadMessages();
+        startAutoRefresh();
+    }
     
     // ===== AMBIL CAPTCHA =====
     async function loadCaptcha() {
@@ -336,11 +668,12 @@
                 hideError();
             }
         } catch (error) {
-            document.getElementById('captchaQuestion').textContent = '❌ Error load captcha';
+            document.getElementById('captchaQuestion').textContent = '3 + 4 = ?';
+            document.getElementById('captchaId').value = 'fallback-' + Date.now();
         }
     }
     
-    // ===== VERIFIKASI =====
+    // ===== VERIFIKASI CAPTCHA + USERNAME =====
     async function verifyCaptcha() {
         const username = document.getElementById('telegramUsername').value.trim();
         const answer = document.getElementById('captchaAnswer').value.trim();
@@ -350,6 +683,10 @@
             showError('Username dan captcha wajib diisi!');
             return;
         }
+        
+        const btn = document.getElementById('verifyBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ VERIFYING...';
         
         try {
             const res = await fetch('/api/verify', {
@@ -361,11 +698,8 @@
             const data = await res.json();
             
             if (data.success) {
-                document.getElementById('verifySection').style.display = 'none';
-                document.getElementById('chatSection').style.display = 'block';
-                document.getElementById('currentUser').textContent = username;
-                loadMessages();
-                startAutoRefresh();
+                sessionValid = true;
+                enterChat(username);
             } else {
                 showError(data.error || 'Verifikasi gagal!');
                 loadCaptcha();
@@ -373,6 +707,9 @@
         } catch (error) {
             showError('Error: ' + error.message);
         }
+        
+        btn.disabled = false;
+        btn.textContent = '🚀 VERIFIKASI';
     }
     
     // ===== KIRIM PESAN =====
@@ -396,7 +733,7 @@
             if (!res.ok) {
                 const data = await res.json();
                 if (res.status === 401) {
-                    alert('Session expired. Verifikasi ulang.');
+                    showError('Session expired. Silahkan login ulang.');
                     logout();
                     return;
                 }
@@ -424,6 +761,7 @@
             }
             
             const data = await res.json();
+            lastMessageCount = data.messages.length;
             renderMessages(data.messages);
         } catch (error) {
             console.error('Load messages error:', error);
@@ -435,7 +773,13 @@
         const container = document.getElementById('messages');
         
         if (!messages || messages.length === 0) {
-            container.innerHTML = '<div class="empty-chat">💬 Belum ada pesan. Mulai chatting!</div>';
+            container.innerHTML = `
+                <div class="empty-chat">
+                    <div class="icon">💬</div>
+                    BELUM ADA PESAN<br>
+                    <span style="font-size:0.6rem;opacity:0.5;">MULAI CHATTING!</span>
+                </div>
+            `;
             return;
         }
         
@@ -455,17 +799,30 @@
         container.scrollTop = container.scrollHeight;
     }
     
+    // ===== TYPING INDICATOR =====
+    document.getElementById('chatInput').addEventListener('input', function() {
+        const indicator = document.getElementById('typingIndicator');
+        if (this.value.length > 0) {
+            indicator.classList.add('active');
+            indicator.textContent = '✎ typing...';
+        } else {
+            indicator.classList.remove('active');
+            indicator.textContent = '✎ ...';
+        }
+    });
+    
     // ===== LOGOUT =====
     async function logout() {
         await fetch('/api/logout', { method: 'POST' });
         document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        sessionValid = false;
         location.reload();
     }
     
     // ===== AUTO REFRESH =====
     function startAutoRefresh() {
         if (refreshInterval) clearInterval(refreshInterval);
-        refreshInterval = setInterval(loadMessages, 5000);
+        refreshInterval = setInterval(loadMessages, 3000);
     }
     
     // ===== ERROR HANDLING =====
@@ -485,14 +842,17 @@
         if (e.key === 'Enter') {
             if (document.getElementById('chatSection').style.display === 'block') {
                 sendMessage();
-            } else {
+            } else if (document.getElementById('verifySection').style.display === 'block') {
                 verifyCaptcha();
             }
         }
     });
     
     // ===== INIT =====
-    loadCaptcha();
+    // Cek session otomatis saat load
+    window.onload = function() {
+        checkSession();
+    };
 </script>
 </body>
     </html>
