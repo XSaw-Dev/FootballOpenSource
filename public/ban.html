@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⛔ AKUN DIBLOKIR</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a14;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(ellipse at 50% 0%, rgba(239, 68, 68, 0.06) 0%, transparent 70%),
+                radial-gradient(ellipse at 50% 100%, rgba(239, 68, 68, 0.03) 0%, transparent 50%);
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 560px;
+            padding: 20px;
+        }
+        
+        .ban-card {
+            background: rgba(16, 16, 30, 0.94);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 24px;
+            padding: 40px 32px 32px;
+            width: 100%;
+            backdrop-filter: blur(24px);
+            box-shadow: 0 24px 80px rgba(239, 68, 68, 0.08);
+            text-align: center;
+        }
+        
+        .ban-icon {
+            font-size: 4.5rem;
+            margin-bottom: 12px;
+            animation: pulse-ban 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-ban {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(239, 68, 68, 0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(239, 68, 68, 0.4)); }
+        }
+        
+        .ban-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fb7185;
+            margin-bottom: 4px;
+            letter-spacing: 2px;
+        }
+        
+        .ban-subtitle {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+        
+        .ban-divider {
+            border: none;
+            border-top: 1px solid rgba(239, 68, 68, 0.08);
+            margin: 20px 0;
+        }
+        
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 14px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        
+        .stat-item .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e0e0e0;
+        }
+        
+        .stat-item .stat-label {
+            font-size: 0.55rem;
+            color: rgba(255, 255, 255, 0.12);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 2px;
+        }
+        
+        .stat-item.danger .stat-value { color: #fb7185; }
+        .stat-item.warning .stat-value { color: #fbbf24; }
+        .stat-item.info .stat-value { color: #60a5fa; }
+        .stat-item.success .stat-value { color: #34d399; }
+        
+        /* ===== RISK METER ===== */
+        .risk-container {
+            margin: 16px 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+        
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .risk-header .risk-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+        }
+        
+        .risk-header .risk-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        
+        .risk-bar-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .risk-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1.5s ease;
+            background: linear-gradient(90deg, #34d399, #fbbf24, #fb7185, #ef4444);
+            width: 0%;
+        }
+        
+        /* ===== REASON ===== */
+        .reason-box {
+            background: rgba(239, 68, 68, 0.04);
+            border: 1px solid rgba(239, 68, 68, 0.06);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 12px 0;
+            text-align: left;
+        }
+        
+        .reason-box .reason-title {
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .reason-box .reason-text {
+            color: #e0e0e0;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            line-height: 1.5;
+        }
+        
+        .possibility-list {
+            margin: 8px 0 4px 16px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.7rem;
+            line-height: 1.8;
+        }
+        
+        .possibility-list li { list-style: disc; }
+        
+        /* ===== BUTTON ===== */
+        .btn {
+            padding: 14px 28px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            border-radius: 12px;
+            color: #fb7185;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            width: 100%;
+            margin-top: 16px;
+        }
+        
+        .btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        
+        .footer-text {
+            color: rgba(255, 255, 255, 0.03);
+            font-size: 0.5rem;
+            letter-spacing: 2px;
+            margin-top: 16px;
+        }
+        
+        @media (max-width: 500px) {
+            .ban-card { padding: 28px 20px; }
+            .ban-title { font-size: 1.6rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-item .stat-value { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="ban-card">
+        <div class="ban-icon">⛔</div>
+        <div class="ban-title">AKSES DIBLOKIR</div>
+        <div class="ban-subtitle">✦ IP ANDA TELAH DIBAN ✦</div>
+        
+        <hr class="ban-divider">
+        
+        <!-- ===== STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-item danger">
+                <div class="stat-value" id="banStatus">BANNED</div>
+                <div class="stat-label">Status</div>
+            </div>
+            <div class="stat-item warning">
+                <div class="stat-value" id="banRisk">0%</div>
+                <div class="stat-label">Risk Level</div>
+            </div>
+            <div class="stat-item info">
+                <div class="stat-value" id="banAttempts">0</div>
+                <div class="stat-label">Failed Attempts</div>
+            </div>
+            <div class="stat-item success">
+                <div class="stat-value" id="banDate">-</div>
+                <div class="stat-label">Banned Since</div>
+            </div>
+        </div>
+        
+        <!-- ===== RISK METER ===== -->
+        <div class="risk-container">
+            <div class="risk-header">
+                <span class="risk-label">⚡ Threat Level</span>
+                <span class="risk-value" id="riskValueText" style="color:#34d399;">LOW</span>
+            </div>
+            <div class="risk-bar-track">
+                <div class="risk-bar-fill" id="riskBarFill"></div>
+            </div>
+        </div>
+        
+        <!-- ===== REASON ===== -->
+        <div class="reason-box">
+            <div class="reason-title">📋 Alasan Pemblokiran</div>
+            <div class="reason-text" id="banReason">Aktivitas mencurigakan terdeteksi dari IP Anda.</div>
+            <ul class="possibility-list" id="possibilityList">
+                <li>Terlalu banyak percobaan login gagal (auto-ban)</li>
+                <li>Aktivitas yang tidak wajar (spam / brute force)</li>
+                <li>Diblokir oleh administrator sistem</li>
+            </ul>
+        </div>
+        
+        <!-- ===== BUTTON ===== -->
+        <button class="btn" onclick="window.location.href='/'">🔄 Coba Lagi</button>
+        <button class="btn btn-secondary" onclick="window.location.href='mailto:support@example.com'">📧 Hubungi Admin</button>
+        
+        <div class="footer-text">✦ CYBER CHAT SECURITY SYSTEM ✦</div>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // AMBIL DATA DARI URL PARAMETER
+    // ============================================================
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            ip: params.get('ip') || '0.0.0.0',
+            reason: params.get('reason') || 'Aktivitas mencurigakan terdeteksi',
+            attempts: parseInt(params.get('attempts')) || 0,
+            risk: parseInt(params.get('risk')) || 0,
+            bannedAt: params.get('bannedAt') || new Date().toISOString(),
+            status: params.get('status') || 'BANNED'
+        };
+    }
+    
+    // ============================================================
+    // RENDER DATA
+    // ============================================================
+    function renderBanPage() {
+        const data = getUrlParams();
+        
+        // Hitung risk level (0-100%)
+        let risk = data.risk;
+        if (risk === 0 && data.attempts > 0) {
+            risk = Math.min(20 + (data.attempts * 12), 95);
+        }
+        if (risk === 0) risk = 35; // default
+        
+        // Tampilkan stats
+        document.getElementById('banStatus').textContent = data.status;
+        document.getElementById('banRisk').textContent = risk + '%';
+        document.getElementById('banAttempts').textContent = data.attempts;
+        document.getElementById('banDate').textContent = new Date(data.bannedAt).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Tampilkan reason
+        document.getElementById('banReason').textContent = data.reason;
+        
+        // Risk meter
+        const riskBar = document.getElementById('riskBarFill');
+        const riskText = document.getElementById('riskValueText');
+        
+        riskBar.style.width = risk + '%';
+        
+        if (risk < 30) {
+            riskText.textContent = 'LOW';
+            riskText.style.color = '#34d399';
+        } else if (risk < 60) {
+            riskText.textContent = 'MEDIUM';
+            riskText.style.color = '#fbbf24';
+        } else if (risk < 85) {
+            riskText.textContent = 'HIGH';
+            riskText.style.color = '#fb7185';
+        } else {
+            riskText.textContent = 'CRITICAL';
+            riskText.style.color = '#ef4444';
+        }
+        
+        // Possibility list dinamis
+        const possibilities = document.getElementById('possibilityList');
+        let items = [];
+        
+        if (data.attempts >= 5) {
+            items.push('Terlalu banyak percobaan login gagal (auto-ban)');
+        }
+        if (data.attempts >= 3 && data.attempts < 5) {
+            items.push('Beberapa percobaan login gagal terdeteksi');
+        }
+        if (risk > 70) {
+            items.push('Aktivitas yang sangat mencurigakan (potensi serangan)');
+        }
+        if (data.reason.toLowerCase().includes('admin')) {
+            items.push('Diblokir langsung oleh administrator sistem');
+        }
+        if (items.length === 0) {
+            items.push('Aktivitas mencurigakan terdeteksi dari IP Anda');
+            items.push('Diblokir oleh sistem keamanan otomatis');
+        }
+        
+        possibilities.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+    }
+    
+    // ============================================================
+    // INIT
+    // ============================================================
+    window.onload = function() {
+        renderBanPage();
+    };
+</script>
+</body>
+  </html>
