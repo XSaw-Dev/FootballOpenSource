@@ -7,17 +7,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ===== FUNGSI SCRAPE OKESTREAM =====
 async function scrapeOkestream() {
     try {
         console.log('🔍 Scraping Okestream...');
         
         const response = await axios.get('https://okestream.tv/', {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Referer': 'https://okestream.tv/'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+                'Referer': 'https://okestream.tv/',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
             },
-            timeout: 15000
+            timeout: 20000
         });
 
         const html = response.data;
@@ -25,59 +28,56 @@ async function scrapeOkestream() {
         
         const matches = [];
         
-        // Cari elemen pertandingan (biasanya di class .live-match atau .match-item)
-        $('.match-item, .live-match, .event, .match-row, .schedule-item').each((i, el) => {
-            const title = $(el).find('.title, .match-name, .event-name, .team-name').text().trim();
-            const league = $(el).find('.league, .tournament, .competition').text().trim();
-            const time = $(el).find('.time, .match-time, .schedule-time').text().trim();
+        // ===== SELECTOR BARU YANG LEBIH FLEKSIBEL =====
+        
+        // 1. Cari semua div yang punya class mengandung 'match', 'live', 'event'
+        $('div[class*="match"], div[class*="live"], div[class*="event"], div[class*="game"], div[class*="fixture"]').each((i, el) => {
+            const text = $(el).text();
             
-            // Cari link streaming (iframe atau direct link)
-            let streamLink = $(el).find('iframe').attr('src');
-            if (!streamLink) {
-                streamLink = $(el).find('a[href*="m3u8"], a[href*="stream"], a[href*="live"]').attr('href');
-            }
-            if (!streamLink) {
-                // Cari di parent atau sibling
-                streamLink = $(el).closest('.match-container').find('iframe').attr('src');
-            }
+            // Cari nama tim (pola "Tim A vs Tim B")
+            const vsMatch = text.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/i);
+            const title = vsMatch ? `${vsMatch[1].trim()} vs ${vsMatch[2].trim()}` : null;
             
-            // Cari link m3u8 dari atribut atau script
-            let m3u8Link = null;
-            const scriptContent = $(el).closest('.match-container').find('script').html();
-            if (scriptContent) {
-                const match = scriptContent.match(/https?:\/\/[^\s"\']+\.m3u8/);
-                if (match) m3u8Link = match[0];
-            }
+            // Cari liga
+            const leagueMatch = text.match(/(Liga|Premier|La Liga|Serie|Bundesliga|Ligue|Champions|Europa|Indonesia|Pers|PS|Arema|Bali|Borneo|PSS|Barito|Madura|Dewa|Malut|Semen|PSIS|PSM|Persija|Persib|Persebaya)/i);
+            const league = leagueMatch ? leagueMatch[0] : 'Liga Unknown';
             
-            if (title || league || streamLink) {
+            // Cari link m3u8 di sekitar elemen
+            const parentHtml = $(el).closest('div, section, article').html() || '';
+            const m3u8Match = parentHtml.match(/https?:\/\/[^\s"\']+\.m3u8/);
+            const m3u8Link = m3u8Match ? m3u8Match[0] : null;
+            
+            // Cari iframe
+            const iframe = $(el).find('iframe').attr('src') || 
+                          $(el).closest('div, section, article').find('iframe').attr('src');
+            
+            if (title || m3u8Link || iframe) {
                 matches.push({
                     id: `match-${Date.now()}-${i}`,
-                    title: title || 'Pertandingan Tanpa Nama',
-                    league: league || 'Liga Unknown',
-                    time: time || 'Waktu Tidak Tersedia',
-                    streamLink: streamLink || null,
+                    title: title || `Match ${i+1}`,
+                    league: league,
+                    time: 'LIVE',
+                    streamLink: iframe || null,
                     m3u8Link: m3u8Link || null,
-                    thumbnail: $(el).find('img').attr('src') || null,
-                    isLive: $(el).find('.live-badge, .badge-live').length > 0 || time.includes('LIVE')
+                    thumbnail: null,
+                    isLive: true
                 });
             }
         });
 
-        // Kalo ga dapet pake selector di atas, coba cara alternatif
+        // 2. Kalo masih kosong, cari semua iframe
         if (matches.length === 0) {
-            console.log('⚠️ Selector default ga dapet, coba alternatif...');
+            console.log('⚠️ Selector pertama kosong, cari iframe...');
             
-            // Cari semua iframe yang ada
             $('iframe').each((i, el) => {
                 const src = $(el).attr('src');
-                if (src && src.includes('m3u8') || src.includes('stream') || src.includes('live')) {
-                    // Cari judul di sekitar iframe
+                if (src && (src.includes('m3u8') || src.includes('stream') || src.includes('live'))) {
                     const parentText = $(el).closest('div, section, article').text().trim();
-                    const titleMatch = parentText.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/);
+                    const vsMatch = parentText.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/i);
                     
                     matches.push({
                         id: `iframe-${i}-${Date.now()}`,
-                        title: titleMatch ? `${titleMatch[1]} vs ${titleMatch[2]}` : `Match ${i+1}`,
+                        title: vsMatch ? `${vsMatch[1].trim()} vs ${vsMatch[2].trim()}` : `Match ${i+1}`,
                         league: 'Liga Unknown',
                         time: 'LIVE',
                         streamLink: src,
@@ -89,22 +89,49 @@ async function scrapeOkestream() {
             });
         }
 
+        // 3. Kalo masih kosong, cari semua link yang mengandung stream
+        if (matches.length === 0) {
+            console.log('⚠️ Iframe kosong, cari link stream...');
+            
+            $('a[href*="m3u8"], a[href*="stream"], a[href*="live"]').each((i, el) => {
+                const href = $(el).attr('href');
+                const text = $(el).text().trim() || $(el).closest('div, section, article').text().trim();
+                const vsMatch = text.match(/([A-Za-z\s]+)\s+vs\s+([A-Za-z\s]+)/i);
+                
+                matches.push({
+                    id: `link-${i}-${Date.now()}`,
+                    title: vsMatch ? `${vsMatch[1].trim()} vs ${vsMatch[2].trim()}` : `Match ${i+1}`,
+                    league: 'Liga Unknown',
+                    time: 'LIVE',
+                    streamLink: href,
+                    m3u8Link: href.includes('.m3u8') ? href : null,
+                    thumbnail: null,
+                    isLive: true
+                });
+            });
+        }
+
         console.log(`✅ Dapet ${matches.length} pertandingan`);
+        
+        // Kalo tetep 0, kasih dummy biar web gak kosong
+        if (matches.length === 0) {
+            return getDummyMatches();
+        }
+        
         return matches;
 
     } catch (error) {
         console.error('❌ Error scraping:', error.message);
-        // Fallback: kasih data dummy kalo error
         return getDummyMatches();
     }
 }
 
-// ===== DUMMY DATA (Fallback) =====
+// ===== DUMMY DATA (biar web gak kosong) =====
 function getDummyMatches() {
     return [
         {
             id: 'dummy-1',
-            title: 'Persib vs Persija',
+            title: 'Persib vs Persija (DUMMY)',
             league: 'Liga 1 Indonesia',
             time: 'LIVE',
             streamLink: null,
@@ -114,8 +141,18 @@ function getDummyMatches() {
         },
         {
             id: 'dummy-2',
-            title: 'Real Madrid vs Barcelona',
+            title: 'Real Madrid vs Barcelona (DUMMY)',
             league: 'La Liga',
+            time: 'LIVE',
+            streamLink: null,
+            m3u8Link: 'https://bfff1.hystreamer.com/live/5006838_F5hd01.m3u8',
+            thumbnail: null,
+            isLive: true
+        },
+        {
+            id: 'dummy-3',
+            title: 'Manchester City vs Liverpool (DUMMY)',
+            league: 'Premier League',
             time: 'LIVE',
             streamLink: null,
             m3u8Link: 'https://bfff1.hystreamer.com/live/5006838_F5hd01.m3u8',
@@ -126,8 +163,6 @@ function getDummyMatches() {
 }
 
 // ===== API ENDPOINTS =====
-
-// GET semua pertandingan
 app.get('/api/matches', async (req, res) => {
     try {
         const matches = await scrapeOkestream();
@@ -146,7 +181,6 @@ app.get('/api/matches', async (req, res) => {
     }
 });
 
-// GET satu pertandingan berdasarkan ID
 app.get('/api/match/:id', async (req, res) => {
     try {
         const matches = await scrapeOkestream();
@@ -156,33 +190,6 @@ app.get('/api/match/:id', async (req, res) => {
             res.json({ success: true, match });
         } else {
             res.status(404).json({ success: false, error: 'Match not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// GET stream link langsung (pake header)
-app.get('/api/stream/:id', async (req, res) => {
-    try {
-        const matches = await scrapeOkestream();
-        const match = matches.find(m => m.id === req.params.id);
-        
-        if (match && match.m3u8Link) {
-            // Proxy stream (biar tembus CORS)
-            const streamUrl = match.m3u8Link;
-            const response = await axios.get(streamUrl, {
-                headers: {
-                    'Referer': 'https://okestream.tv/',
-                    'User-Agent': 'Mozilla/5.0'
-                },
-                responseType: 'stream'
-            });
-            
-            res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
-            response.data.pipe(res);
-        } else {
-            res.status(404).json({ success: false, error: 'Stream not found' });
         }
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
