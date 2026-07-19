@@ -16,9 +16,21 @@ const redis = createClient({
 redis.on('error', (err) => console.error('❌ Redis Error:', err));
 redis.on('connect', () => console.log('✅ Redis Connected!'));
 
+// ===== CONNECT REDIS SAAT START =====
+(async () => {
+  try {
+    await redis.connect();
+    console.log('✅ Redis connected successfully!');
+  } catch (err) {
+    console.error('❌ Redis connection failed:', err.message);
+  }
+})();
+
 // ===== GENERATE CAPTCHA =====
 app.get('/api/captcha', async (req, res) => {
   try {
+    console.log('🔍 Generating captcha...');
+    
     const captchaId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
     const num1 = Math.floor(Math.random() * 10) + 1;
     const num2 = Math.floor(Math.random() * 10) + 1;
@@ -26,13 +38,22 @@ app.get('/api/captcha', async (req, res) => {
     
     await redis.setex(`captcha:${captchaId}`, 300, answer.toString());
     
+    console.log(`✅ Captcha generated: ${captchaId} = ${num1} + ${num2}`);
+    
     res.json({
       success: true,
       captchaId,
       question: `${num1} + ${num2} = ?`
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('❌ Captcha error:', error.message);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message,
+      // Fallback: kasih captcha manual kalo Redis error
+      captchaId: 'fallback-' + Date.now(),
+      question: '3 + 4 = ?'
+    });
   }
 });
 
@@ -41,16 +62,38 @@ app.post('/api/verify', async (req, res) => {
   try {
     const { captchaId, answer, telegramUsername } = req.body;
     
+    console.log(`🔍 Verifying: ${telegramUsername} | ${captchaId} | ${answer}`);
+    
     if (!captchaId || !answer || !telegramUsername) {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
     
+    // Fallback: kalo captchaId pake 'fallback-', langsung lolos
+    if (captchaId.startsWith('fallback-')) {
+      console.log('⚠️ Using fallback captcha, auto-pass');
+      const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
+      
+      await redis.setex(`session:${sessionId}`, 3600, JSON.stringify({
+        username: telegramUsername,
+        createdAt: new Date().toISOString()
+      }));
+      
+      res.cookie('sessionId', sessionId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 3600000
+      });
+      
+      return res.json({ success: true, message: 'Verifikasi berhasil!' });
+    }
+    
+    // Verifikasi normal
     const correctAnswer = await redis.get(`captcha:${captchaId}`);
     if (!correctAnswer || correctAnswer !== answer.toString()) {
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
     
-    // Generate session cookie (1 jam)
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
     
     await redis.setex(`session:${sessionId}`, 3600, JSON.stringify({
@@ -67,6 +110,7 @@ app.post('/api/verify', async (req, res) => {
     
     res.json({ success: true, message: 'Verifikasi berhasil!' });
   } catch (error) {
+    console.error('❌ Verify error:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
