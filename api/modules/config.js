@@ -1,4 +1,6 @@
-// ===== CONFIG & CONSTANTS =====
+// ================================================================
+// CONFIG - api/modules/config.js
+// ================================================================
 module.exports = {
   SESSION_EXPIRY: 7 * 24 * 3600, // 7 hari
   CAPTCHA_EXPIRY: 300, // 5 menit
@@ -8,7 +10,6 @@ module.exports = {
   WAF_HISTORY_LIMIT: 50,
   ATTACK_LOG_LIMIT: 1000,
   
-  // Rate limits
   RATE_LIMITS: {
     general: { window: 15 * 60 * 1000, max: 100 },
     login: { window: 15 * 60 * 1000, max: 20 },
