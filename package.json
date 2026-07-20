@@ -1,7 +1,7 @@
 {
   "name": "cyber-chat",
   "version": "1.0.0",
-  "description": "Cyber chat room with advanced WAF & modular structure",
+  "description": "Cyber chat room with advanced security",
   "main": "api/index.js",
   "scripts": {
     "start": "node api/index.js"
@@ -11,7 +11,6 @@
     "cors": "^2.8.5",
     "cookie-parser": "^1.4.6",
     "ioredis": "^5.3.2",
-    "express-rate-limit": "^7.1.5",
-    "helmet": "^7.1.0"
+    "express-rate-limit": "^7.1.5"
   }
 }
