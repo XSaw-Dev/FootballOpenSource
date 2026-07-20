@@ -141,7 +141,7 @@ async function wafMiddleware(req, res, next) {
       return res.status(403).json({
         error: 'WAF_BLOCKED',
         message: 'Request diblokir oleh WAF.',
-        redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=WAF blocked: ${detection.pattern}`
+        redirect: `/api/ban-status?ip=${encodeURIComponent(ip)}&reason=WAF blocked: ${detection.pattern}`
       });
     }
   } catch (error) {
@@ -187,12 +187,12 @@ async function logIP(req, res, next) {
 app.use(logIP);
 
 // ================================================================
-// 9. BAN CHECK MIDDLEWARE
+// 9. BAN CHECK MIDDLEWARE (RETURN JSON, BUKAN REDIRECT)
 // ================================================================
 async function checkBan(req, res, next) {
   const ip = getRealIP(req);
   
-  if (req.path === '/ban.html' || req.path.startsWith('/_next/') || req.path.startsWith('/static/')) {
+  if (req.path === '/api/ban-status' || req.path.startsWith('/_next/') || req.path.startsWith('/static/')) {
     return next();
   }
   
@@ -200,17 +200,32 @@ async function checkBan(req, res, next) {
     const redisBan = await redis.get(`ban:${ip}`);
     if (redisBan) {
       const banData = JSON.parse(redisBan);
-      const redirectUrl = `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(banData.reason || 'Diblokir oleh admin')}&status=BANNED`;
+      const attempts = await redis.get(`ip:${ip}`);
+      const attemptData = attempts ? JSON.parse(attempts) : { attempts: 0 };
       
+      let risk = Math.min(20 + (attemptData.attempts || 0) * 12, 95);
+      if (banData.reason && banData.reason.includes('admin')) risk = 90;
+      if (banData.reason && banData.reason.includes('WAF')) risk = 99;
+      
+      // Kalo request API, kasih JSON
       if (req.path.startsWith('/api/')) {
         return res.status(403).json({
           error: 'BANNED',
           message: 'IP Anda telah diblokir',
-          redirect: redirectUrl
+          banData: {
+            ip: ip,
+            reason: banData.reason || 'Diblokir oleh admin',
+            attempts: attemptData.attempts || 0,
+            risk: risk,
+            bannedAt: banData.bannedAt,
+            status: 'BANNED'
+          }
         });
       }
       
-      return res.redirect(redirectUrl);
+      // Kalo request HTML, kirim HTML dengan status ban
+      // Biar frontend handle sendiri via JS
+      return next();
     }
   } catch (error) {
     console.error('❌ Check ban error:', error.message);
@@ -222,7 +237,41 @@ async function checkBan(req, res, next) {
 app.use(checkBan);
 
 // ================================================================
-// 10. GENERATE SESSION SIGNATURE
+// 10. BAN STATUS API (UNTUK FRONTEND CEK BAN)
+// ================================================================
+app.get('/api/ban-status', async (req, res) => {
+  try {
+    const ip = req.query.ip || getRealIP(req);
+    const redisBan = await redis.get(`ban:${ip}`);
+    
+    if (redisBan) {
+      const banData = JSON.parse(redisBan);
+      const attempts = await redis.get(`ip:${ip}`);
+      const attemptData = attempts ? JSON.parse(attempts) : { attempts: 0 };
+      
+      let risk = Math.min(20 + (attemptData.attempts || 0) * 12, 95);
+      if (banData.reason && banData.reason.includes('admin')) risk = 90;
+      if (banData.reason && banData.reason.includes('WAF')) risk = 99;
+      
+      return res.json({
+        isBanned: true,
+        ip: ip,
+        reason: banData.reason || 'Diblokir oleh admin',
+        attempts: attemptData.attempts || 0,
+        risk: risk,
+        bannedAt: banData.bannedAt,
+        status: 'BANNED'
+      });
+    }
+    
+    res.json({ isBanned: false });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ================================================================
+// 11. GENERATE SESSION SIGNATURE
 // ================================================================
 function generateSessionSignature(username, ip, userAgent, timestamp) {
   const raw = `${username}|${ip}|${userAgent}|${timestamp}`;
@@ -230,7 +279,7 @@ function generateSessionSignature(username, ip, userAgent, timestamp) {
 }
 
 // ================================================================
-// 11. SESSION MIDDLEWARE
+// 12. SESSION MIDDLEWARE
 // ================================================================
 async function checkSession(req, res, next) {
   try {
@@ -271,7 +320,7 @@ async function checkSession(req, res, next) {
 }
 
 // ================================================================
-// 12. DEVELOPER MIDDLEWARE
+// 13. DEVELOPER MIDDLEWARE
 // ================================================================
 async function checkDeveloper(req, res, next) {
   try {
@@ -301,7 +350,7 @@ async function checkDeveloper(req, res, next) {
 }
 
 // ================================================================
-// 13. CAPTCHA
+// 14. CAPTCHA
 // ================================================================
 app.get('/api/captcha', async (req, res) => {
   try {
@@ -327,7 +376,7 @@ app.get('/api/captcha', async (req, res) => {
 });
 
 // ================================================================
-// 14. VERIFY CAPTCHA
+// 15. VERIFY CAPTCHA
 // ================================================================
 app.post('/api/verify', async (req, res) => {
   const ip = getRealIP(req);
@@ -345,7 +394,11 @@ app.post('/api/verify', async (req, res) => {
       const banData = JSON.parse(redisBan);
       return res.status(403).json({
         error: 'BANNED',
-        redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(banData.reason || 'Diblokir oleh admin')}`
+        banData: {
+          ip: ip,
+          reason: banData.reason || 'Diblokir oleh admin',
+          status: 'BANNED'
+        }
       });
     }
     
@@ -374,7 +427,14 @@ app.post('/api/verify', async (req, res) => {
         }));
         return res.status(429).json({
           error: 'AUTO_BANNED',
-          redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=Auto-ban: too many attempts`
+          banData: {
+            ip: ip,
+            reason: 'Terlalu banyak percobaan login gagal (auto-ban)',
+            attempts: data.attempts,
+            risk: 85,
+            bannedAt: new Date().toISOString(),
+            status: 'BANNED'
+          }
         });
       }
       
@@ -419,7 +479,7 @@ app.post('/api/verify', async (req, res) => {
 });
 
 // ================================================================
-// 15. DEVELOPER LOGIN
+// 16. DEVELOPER LOGIN
 // ================================================================
 app.post('/api/developer-login', async (req, res) => {
   const ip = getRealIP(req);
@@ -456,7 +516,7 @@ app.post('/api/developer-login', async (req, res) => {
 });
 
 // ================================================================
-// 16. CHECK SESSION
+// 17. CHECK SESSION
 // ================================================================
 app.get('/api/check-session', async (req, res) => {
   try {
@@ -499,7 +559,7 @@ app.get('/api/check-session', async (req, res) => {
 });
 
 // ================================================================
-// 17. CHAT - SEND MESSAGE
+// 18. CHAT - SEND MESSAGE
 // ================================================================
 app.post('/api/chat/send', checkSession, async (req, res) => {
   try {
@@ -527,7 +587,7 @@ app.post('/api/chat/send', checkSession, async (req, res) => {
 });
 
 // ================================================================
-// 18. CHAT - GET MESSAGES
+// 19. CHAT - GET MESSAGES
 // ================================================================
 app.get('/api/chat/messages', checkSession, async (req, res) => {
   try {
@@ -543,7 +603,7 @@ app.get('/api/chat/messages', checkSession, async (req, res) => {
 });
 
 // ================================================================
-// 19. CHAT - CLEAR MESSAGES
+// 20. CHAT - CLEAR MESSAGES
 // ================================================================
 app.delete('/api/chat/clear', checkDeveloper, async (req, res) => {
   try {
@@ -555,7 +615,7 @@ app.delete('/api/chat/clear', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 20. TYPING INDICATOR
+// 21. TYPING INDICATOR
 // ================================================================
 app.post('/api/typing', checkSession, async (req, res) => {
   try {
@@ -586,7 +646,7 @@ app.get('/api/typing-users', checkSession, async (req, res) => {
 });
 
 // ================================================================
-// 21. ONLINE USERS
+// 22. ONLINE USERS
 // ================================================================
 app.get('/api/online-users', checkSession, async (req, res) => {
   try {
@@ -606,7 +666,7 @@ app.get('/api/online-users', checkSession, async (req, res) => {
 });
 
 // ================================================================
-// 22. IP LIST
+// 23. IP LIST
 // ================================================================
 app.get('/api/ip-list', checkDeveloper, async (req, res) => {
   try {
@@ -637,7 +697,7 @@ app.get('/api/ip-list', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 23. BAN IP
+// 24. BAN IP
 // ================================================================
 app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
   try {
@@ -649,10 +709,28 @@ app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
       reason: reason || 'Diblokir oleh admin'
     }));
     
+    const currentIP = getRealIP(req);
+    const banData = {
+      ip: ip,
+      reason: reason || 'Diblokir oleh admin',
+      status: 'BANNED',
+      bannedAt: new Date().toISOString()
+    };
+    
+    // Kalo IP yang diban = IP sendiri, kasih response khusus
+    if (ip === currentIP) {
+      return res.json({
+        success: true,
+        message: `✅ IP ${ip} berhasil diblokir.`,
+        selfBan: true,
+        banData: banData
+      });
+    }
+    
     res.json({
       success: true,
       message: `✅ IP ${ip} berhasil diblokir.`,
-      redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(reason || 'Diblokir oleh admin')}`
+      banData: banData
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -660,7 +738,7 @@ app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 24. UNBAN IP
+// 25. UNBAN IP
 // ================================================================
 app.post('/api/unban-ip', checkDeveloper, async (req, res) => {
   try {
@@ -675,7 +753,7 @@ app.post('/api/unban-ip', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 25. DELETE IP
+// 26. DELETE IP
 // ================================================================
 app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
   try {
@@ -698,7 +776,7 @@ app.delete('/api/delete-ip', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 26. WAF STATS
+// 27. WAF STATS
 // ================================================================
 app.get('/api/waf-stats', checkDeveloper, async (req, res) => {
   try {
@@ -728,7 +806,7 @@ app.get('/api/waf-stats', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 27. TEST SECURITY
+// 28. TEST SECURITY
 // ================================================================
 app.get('/api/test-security', checkDeveloper, async (req, res) => {
   try {
@@ -750,7 +828,7 @@ app.get('/api/test-security', checkDeveloper, async (req, res) => {
 });
 
 // ================================================================
-// 28. LOGOUT
+// 29. LOGOUT
 // ================================================================
 app.post('/api/logout', async (req, res) => {
   try {
@@ -764,7 +842,7 @@ app.post('/api/logout', async (req, res) => {
 });
 
 // ================================================================
-// 29. PING
+// 30. PING
 // ================================================================
 app.get('/api/ping', async (req, res) => {
   try {
@@ -776,7 +854,7 @@ app.get('/api/ping', async (req, res) => {
 });
 
 // ================================================================
-// 30. 404 & ERROR HANDLER
+// 31. 404 & ERROR HANDLER
 // ================================================================
 app.use((req, res) => {
   res.status(404).json({ error: 'NOT_FOUND', message: 'Endpoint tidak ditemukan.' });
