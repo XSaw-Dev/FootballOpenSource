@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ CYBER CHAT PREMIUM</title>
     <style>
-        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -35,8 +34,6 @@
         }
         .chat-title { text-align: center; font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #8b5cf6, #6d28d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2px; flex-shrink: 0; letter-spacing: 1px; }
         .chat-subtitle { text-align: center; color: rgba(255,255,255,0.08); font-size: 0.55rem; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 14px; flex-shrink: 0; }
-        
-        /* ===== GATEWAY ===== */
         #gatewaySection { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; gap: 12px; }
         .gateway-icon { font-size: 3.6rem; animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -45,11 +42,8 @@
         .gateway-status { padding: 8px 22px; border: 1px solid rgba(255,255,255,0.06); border-radius: 30px; font-size: 0.75rem; color: rgba(255,255,255,0.25); min-width: 180px; }
         .gateway-status.valid { border-color: rgba(52,211,153,0.25); color: #34d399; }
         .gateway-status.expired { border-color: rgba(251,113,133,0.2); color: #fb7185; }
-        
-        /* ===== VERIFIKASI ===== */
         #verifySection { display: none; flex-direction: column; gap: 14px; flex: 1; justify-content: center; max-width: 440px; margin: 0 auto; width: 100%; }
         #chatSection { display: none; flex-direction: column; flex: 1; min-height: 0; }
-        
         .input-group { display: flex; flex-direction: column; gap: 5px; }
         .input-group label { color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 500; letter-spacing: 1px; }
         .input-field { padding: 11px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; color: #e0e0e0; font-size: 0.95rem; transition: all 0.3s ease; font-family: inherit; }
@@ -58,7 +52,6 @@
         .captcha-box { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; text-align: center; }
         .captcha-box .question { font-size: 1.8rem; font-weight: 600; color: #a78bfa; }
         .captcha-box .hint { color: rgba(255,255,255,0.06); font-size: 0.55rem; margin-top: 4px; letter-spacing: 2px; }
-        
         .btn { padding: 11px 20px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none; border-radius: 12px; color: white; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(139,92,246,0.2); }
         .btn:active { transform: translateY(0); }
@@ -74,16 +67,11 @@
         .btn-clear:hover { box-shadow: 0 8px 28px rgba(139,92,246,0.2); }
         .btn-success { background: linear-gradient(135deg, #34d399, #10b981); }
         .btn-success:hover { box-shadow: 0 8px 28px rgba(52,211,153,0.2); }
-        .btn-waf { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
-        .btn-waf:hover { box-shadow: 0 8px 28px rgba(59,130,246,0.2); }
-        
         #developerLoginSection { display: none; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid rgba(245,158,11,0.1); border-radius: 12px; background: rgba(245,158,11,0.02); margin-top: 8px; }
         #developerLoginSection.active { display: flex; }
         .developer-toggle { text-align: center; margin-top: 8px; }
         .developer-toggle button { background: none; border: none; color: rgba(255,255,255,0.1); font-size: 0.6rem; cursor: pointer; text-decoration: underline; font-family: inherit; }
         .developer-toggle button:hover { color: rgba(255,255,255,0.2); }
-        
-        /* ===== CHAT ===== */
         .chat-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
         .chat-user { color: rgba(255,255,255,0.2); font-size: 0.7rem; }
         .chat-user span { color: #a78bfa; font-weight: 600; }
@@ -94,7 +82,6 @@
         @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
         .online-count { color: rgba(255,255,255,0.08); font-size: 0.6rem; }
         .chat-actions { display: flex; gap: 5px; flex-wrap: wrap; }
-        
         #messages { flex: 1; overflow-y: auto; padding: 10px 6px; background: rgba(255,255,255,0.01); border-radius: 12px; border: 1px solid rgba(255,255,255,0.02); margin: 8px 0; min-height: 0; }
         #messages::-webkit-scrollbar { width: 3px; }
         #messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
@@ -108,14 +95,11 @@
         .message .msg-time { color: rgba(255,255,255,0.03); font-size: 0.4rem; float: right; margin-top: 1px; }
         .empty-chat { text-align: center; color: rgba(255,255,255,0.03); padding: 40px 0; font-size: 0.75rem; }
         .empty-chat .icon { font-size: 2rem; margin-bottom: 6px; opacity: 0.08; }
-        
         .typing-indicator { color: rgba(255,255,255,0.05); font-size: 0.6rem; padding: 2px 10px; min-height: 18px; transition: all 0.3s ease; flex-shrink: 0; }
         .typing-indicator.active { color: rgba(139,92,246,0.2); }
         .chat-input-area { display: flex; gap: 6px; flex-shrink: 0; padding-top: 4px; flex-wrap: wrap; }
         .chat-input-area .input-field { flex: 1; min-width: 100px; padding: 9px 12px; font-size: 0.8rem; }
         .chat-input-area .btn { padding: 9px 18px; font-size: 0.8rem; flex-shrink: 0; }
-        
-        /* ===== DEVELOPER DASHBOARD ===== */
         #developerDashboard { display: none; flex-direction: column; gap: 8px; padding: 10px 12px; background: rgba(59,130,246,0.02); border: 1px solid rgba(59,130,246,0.05); border-radius: 12px; margin-bottom: 6px; flex-shrink: 0; }
         #developerDashboard.active { display: flex; }
         .dev-dashboard-title { color: #3b82f6; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
@@ -131,7 +115,6 @@
         .dev-stat .label { font-size: 0.45rem; color: rgba(255,255,255,0.1); margin-top: 1px; }
         .dev-actions { display: flex; gap: 6px; flex-wrap: wrap; }
         .dev-actions .btn { flex: 1; min-width: 70px; padding: 6px 10px; font-size: 0.6rem; }
-        
         .ip-control-bar { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
         .ip-control-bar .input-field { flex: 1; min-width: 100px; padding: 6px 10px; font-size: 0.7rem; }
         .ip-control-bar .btn { padding: 6px 12px; font-size: 0.6rem; }
@@ -148,7 +131,6 @@
         .ip-item .ip-info .ip-detail { color: rgba(255,255,255,0.06); font-size: 0.4rem; }
         .ip-item .ip-actions { display: flex; gap: 2px; flex-wrap: wrap; }
         .ip-item .ip-actions .btn { padding: 1px 8px; font-size: 0.45rem; border-radius: 6px; }
-        
         .waf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 10px; }
         .waf-stat { background: rgba(255,255,255,0.02); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.03); }
         .waf-stat .value { font-size: 1.2rem; font-weight: 700; }
@@ -158,21 +140,16 @@
         #wafChart { height: 80px; display: flex; align-items: flex-end; gap: 2px; padding: 2px 0; overflow-x: auto; }
         #wafChart .bar { flex: 1; min-width: 4px; border-radius: 2px 2px 0 0; transition: all 0.5s ease; }
         .waf-updated { color: rgba(255,255,255,0.04); font-size: 0.4rem; text-align: right; margin-top: 4px; }
-        
         .error { color: #fb7185; text-align: center; padding: 6px; border: 1px solid rgba(251,113,133,0.08); border-radius: 8px; display: none; font-size: 0.7rem; flex-shrink: 0; }
         .security-result { color: rgba(255,255,255,0.15); font-size: 0.6rem; padding: 6px; background: rgba(255,255,255,0.01); border-radius: 8px; margin-top: 4px; display: none; line-height: 1.6; }
         .security-result.success { color: #34d399; border: 1px solid rgba(52,211,153,0.08); }
         .security-result.error { color: #fb7185; border: 1px solid rgba(251,113,133,0.08); }
-        
-        /* ================================================================
-           BAN OVERLAY (FULLSCREEN)
-           ================================================================ */
         #banOverlay {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(10, 10, 20, 0.97);
+            background: rgba(10,10,20,0.97);
             backdrop-filter: blur(30px);
             z-index: 9999;
             justify-content: center;
@@ -180,16 +157,8 @@
             animation: banFadeIn 0.6s ease-out;
         }
         #banOverlay.active { display: flex; }
-        @keyframes banFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        .ban-overlay-content {
-            max-width: 520px;
-            width: 100%;
-            padding: 20px;
-            text-align: center;
-        }
+        @keyframes banFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .ban-overlay-content { max-width: 520px; width: 100%; padding: 20px; text-align: center; }
         .ban-overlay-icon { font-size: 4.5rem; margin-bottom: 12px; animation: pulse-ban 2s ease-in-out infinite; }
         @keyframes pulse-ban { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(239,68,68,0.2)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(239,68,68,0.4)); } }
         .ban-overlay-title { font-size: 2rem; font-weight: 700; color: #fb7185; margin-bottom: 4px; letter-spacing: 2px; }
@@ -203,26 +172,22 @@
         .ban-overlay-stat.warning .stat-value { color: #fbbf24; }
         .ban-overlay-stat.info .stat-value { color: #60a5fa; }
         .ban-overlay-stat.success .stat-value { color: #34d399; }
-        
         .ban-overlay-risk { margin: 12px 0; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.03); }
         .ban-overlay-risk .risk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .ban-overlay-risk .risk-label { font-size: 0.7rem; color: rgba(255,255,255,0.15); letter-spacing: 2px; }
         .ban-overlay-risk .risk-value { font-size: 1rem; font-weight: 700; }
         .ban-overlay-risk .risk-bar-track { width: 100%; height: 5px; background: rgba(255,255,255,0.04); border-radius: 10px; overflow: hidden; }
         .ban-overlay-risk .risk-bar-fill { height: 100%; border-radius: 10px; transition: width 1.5s ease; background: linear-gradient(90deg, #34d399, #fbbf24, #fb7185, #ef4444); width: 0%; }
-        
         .ban-overlay-reason { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.06); border-radius: 12px; padding: 14px; margin: 10px 0; text-align: left; }
         .ban-overlay-reason .reason-title { color: rgba(255,255,255,0.15); font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; }
         .ban-overlay-reason .reason-text { color: #e0e0e0; font-size: 0.8rem; margin-top: 4px; line-height: 1.5; }
         .ban-overlay-possibilities { margin: 6px 0 2px 16px; color: rgba(255,255,255,0.15); font-size: 0.65rem; line-height: 1.8; }
         .ban-overlay-possibilities li { list-style: disc; }
-        
         .ban-overlay-btn { padding: 12px 24px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.12); border-radius: 12px; color: #fb7185; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; font-family: inherit; width: 100%; margin-top: 12px; }
         .ban-overlay-btn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.2); transform: translateY(-2px); }
         .ban-overlay-btn-secondary { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.04); color: rgba(255,255,255,0.15); }
         .ban-overlay-btn-secondary:hover { background: rgba(255,255,255,0.06); }
         .ban-overlay-footer { color: rgba(255,255,255,0.02); font-size: 0.45rem; letter-spacing: 2px; margin-top: 12px; }
-        
         @media (max-width: 600px) {
             .container { padding: 6px; }
             .chat-card { padding: 14px; height: 98vh; max-height: none; border-radius: 16px; }
@@ -243,23 +208,17 @@
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="chat-card">
         <div class="chat-title">⚡ CYBER CHAT</div>
         <div class="chat-subtitle">SECURE • REAL-TIME • PREMIUM</div>
-        
         <div id="errorMsg" class="error"></div>
-        
-        <!-- GATEWAY -->
         <div id="gatewaySection">
             <div class="gateway-icon">🔐</div>
             <div class="gateway-title">Security Gateway</div>
             <div class="gateway-desc">✦ Verifikasi sesi untuk akses chat ✦</div>
             <div class="gateway-status" id="gatewayStatus">⏳ Memeriksa session...</div>
         </div>
-        
-        <!-- VERIFIKASI -->
         <div id="verifySection">
             <div class="input-group">
                 <label>👤 Username Telegram</label>
@@ -290,8 +249,6 @@
                 <button class="btn btn-developer" onclick="developerLogin()">🔑 Login Developer</button>
             </div>
         </div>
-        
-        <!-- CHAT -->
         <div id="chatSection">
             <div class="chat-header">
                 <div>
@@ -306,8 +263,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- DEVELOPER DASHBOARD -->
             <div id="developerDashboard">
                 <div class="dev-dashboard-title">📊 Developer Dashboard</div>
                 <div class="dev-tabs">
@@ -317,25 +272,12 @@
                     <button class="btn" onclick="showDevTab('security')" data-tab="security">🔒 Security</button>
                 </div>
                 <div id="devTabStats" class="dev-tab-content active">
-                    <div class="dev-stats">
-                        <div class="dev-stat"><div class="value" id="statUsers">0</div><div class="label">Online Users</div></div>
-                        <div class="dev-stat"><div class="value" id="statMessages">0</div><div class="label">Total Messages</div></div>
-                        <div class="dev-stat"><div class="value" id="statBlocked">0</div><div class="label">Blocked IPs</div></div>
-                    </div>
-                    <div class="dev-actions">
-                        <button class="btn btn-clear btn-sm" onclick="clearMessages()">🗑️ Clear Messages</button>
-                    </div>
+                    <div class="dev-stats"><div class="dev-stat"><div class="value" id="statUsers">0</div><div class="label">Online Users</div></div><div class="dev-stat"><div class="value" id="statMessages">0</div><div class="label">Total Messages</div></div><div class="dev-stat"><div class="value" id="statBlocked">0</div><div class="label">Blocked IPs</div></div></div>
+                    <div class="dev-actions"><button class="btn btn-clear btn-sm" onclick="clearMessages()">🗑️ Clear Messages</button></div>
                 </div>
                 <div id="devTabWaf" class="dev-tab-content">
-                    <div class="waf-grid">
-                        <div class="waf-stat"><div class="value" id="wafTotalRequests" style="color:#60a5fa;">0</div><div class="label">Total Requests</div></div>
-                        <div class="waf-stat"><div class="value" id="wafUniqueIPs" style="color:#34d399;">0</div><div class="label">Unique IPs</div></div>
-                        <div class="waf-stat"><div class="value" id="wafBannedIPs" style="color:#fb7185;">0</div><div class="label">Banned IPs</div></div>
-                    </div>
-                    <div class="waf-chart-container">
-                        <div class="waf-chart-title">📈 TRAFFIC HISTORY (50 DATA)</div>
-                        <div id="wafChart"><div style="color:rgba(255,255,255,0.05);font-size:0.5rem;padding:20px 0;text-align:center;width:100%;">Loading chart...</div></div>
-                    </div>
+                    <div class="waf-grid"><div class="waf-stat"><div class="value" id="wafTotalRequests" style="color:#60a5fa;">0</div><div class="label">Total Requests</div></div><div class="waf-stat"><div class="value" id="wafUniqueIPs" style="color:#34d399;">0</div><div class="label">Unique IPs</div></div><div class="waf-stat"><div class="value" id="wafBannedIPs" style="color:#fb7185;">0</div><div class="label">Banned IPs</div></div></div>
+                    <div class="waf-chart-container"><div class="waf-chart-title">📈 TRAFFIC HISTORY (50 DATA)</div><div id="wafChart"><div style="color:rgba(255,255,255,0.05);font-size:0.5rem;padding:20px 0;text-align:center;width:100%;">Loading chart...</div></div></div>
                     <div class="waf-updated" id="wafLastUpdated">Last updated: -</div>
                 </div>
                 <div id="devTabIpcontrol" class="dev-tab-content">
@@ -348,13 +290,10 @@
                     <div id="ipListContainer"><div style="color:rgba(255,255,255,0.05);text-align:center;padding:10px;font-size:0.6rem;">Loading IP list...</div></div>
                 </div>
                 <div id="devTabSecurity" class="dev-tab-content">
-                    <div class="dev-actions">
-                        <button class="btn btn-secondary btn-sm" onclick="testSecurity()">🛡️ Test Security Gateway</button>
-                    </div>
+                    <div class="dev-actions"><button class="btn btn-secondary btn-sm" onclick="testSecurity()">🛡️ Test Security Gateway</button></div>
                     <div id="securityTestResult" class="security-result"></div>
                 </div>
             </div>
-            
             <div id="messages"><div class="empty-chat"><div class="icon">💬</div>BELUM ADA PESAN</div></div>
             <div class="typing-indicator" id="typingIndicator">✎ ...</div>
             <div class="chat-input-area">
@@ -362,70 +301,35 @@
                 <button class="btn" onclick="sendMessage()">➤ Kirim</button>
             </div>
         </div>
-        
     </div>
 </div>
-
-<!-- ================================================================
-     BAN OVERLAY (FULLSCREEN)
-     ================================================================ -->
 <div id="banOverlay">
     <div class="ban-overlay-content">
         <div class="ban-overlay-icon">⛔</div>
         <div class="ban-overlay-title">AKSES DIBLOKIR</div>
         <div class="ban-overlay-subtitle">✦ IP ANDA TELAH DIBAN ✦</div>
         <hr class="ban-overlay-divider">
-        
         <div class="ban-overlay-stats">
-            <div class="ban-overlay-stat danger">
-                <div class="stat-value" id="banStatus">BANNED</div>
-                <div class="stat-label">Status</div>
-            </div>
-            <div class="ban-overlay-stat warning">
-                <div class="stat-value" id="banRisk">0%</div>
-                <div class="stat-label">Risk Level</div>
-            </div>
-            <div class="ban-overlay-stat info">
-                <div class="stat-value" id="banAttempts">0</div>
-                <div class="stat-label">Failed Attempts</div>
-            </div>
-            <div class="ban-overlay-stat success">
-                <div class="stat-value" id="banDate">-</div>
-                <div class="stat-label">Banned Since</div>
-            </div>
+            <div class="ban-overlay-stat danger"><div class="stat-value" id="banStatus">BANNED</div><div class="stat-label">Status</div></div>
+            <div class="ban-overlay-stat warning"><div class="stat-value" id="banRisk">0%</div><div class="stat-label">Risk Level</div></div>
+            <div class="ban-overlay-stat info"><div class="stat-value" id="banAttempts">0</div><div class="stat-label">Failed Attempts</div></div>
+            <div class="ban-overlay-stat success"><div class="stat-value" id="banDate">-</div><div class="stat-label">Banned Since</div></div>
         </div>
-        
         <div class="ban-overlay-risk">
-            <div class="risk-header">
-                <span class="risk-label">⚡ Threat Level</span>
-                <span class="risk-value" id="banRiskText" style="color:#34d399;">LOW</span>
-            </div>
-            <div class="risk-bar-track">
-                <div class="risk-bar-fill" id="banRiskBar"></div>
-            </div>
+            <div class="risk-header"><span class="risk-label">⚡ Threat Level</span><span class="risk-value" id="banRiskText" style="color:#34d399;">LOW</span></div>
+            <div class="risk-bar-track"><div class="risk-bar-fill" id="banRiskBar"></div></div>
         </div>
-        
         <div class="ban-overlay-reason">
             <div class="reason-title">📋 Alasan Pemblokiran</div>
             <div class="reason-text" id="banReason">Aktivitas mencurigakan terdeteksi.</div>
-            <ul class="ban-overlay-possibilities" id="banPossibilities">
-                <li>Terlalu banyak percobaan login gagal (auto-ban)</li>
-                <li>Aktivitas yang tidak wajar</li>
-                <li>Diblokir oleh administrator</li>
-            </ul>
+            <ul class="ban-overlay-possibilities" id="banPossibilities"><li>Terlalu banyak percobaan login gagal (auto-ban)</li><li>Aktivitas yang tidak wajar</li><li>Diblokir oleh administrator</li></ul>
         </div>
-        
         <button class="ban-overlay-btn" onclick="location.reload()">🔄 Coba Lagi</button>
         <button class="ban-overlay-btn ban-overlay-btn-secondary" onclick="window.location.href='mailto:support@example.com'">📧 Hubungi Admin</button>
-        
         <div class="ban-overlay-footer">✦ CYBER CHAT SECURITY SYSTEM ✦</div>
     </div>
 </div>
-
 <script>
-    // ============================================================
-    // ANTI-DEVTOOLS
-    // ============================================================
     document.addEventListener('keydown', (e) => {
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
             e.preventDefault();
@@ -434,28 +338,16 @@
         }
     });
     document.addEventListener('contextmenu', (e) => { e.preventDefault(); showError('⛔ Right-click diblokir.'); return false; });
-    
-    // ============================================================
-    // GLOBAL
-    // ============================================================
     let refreshInterval = null, typingInterval = null, wafInterval = null;
     let lastMessageCount = 0;
     let isDeveloper = false, username = '', isVerifying = false;
-    
-    // ============================================================
-    // BAN OVERLAY
-    // ============================================================
     function showBanOverlay(banData) {
         const overlay = document.getElementById('banOverlay');
-        
-        // Set data
         document.getElementById('banStatus').textContent = banData.status || 'BANNED';
         document.getElementById('banRisk').textContent = (banData.risk || 0) + '%';
         document.getElementById('banAttempts').textContent = banData.attempts || 0;
         document.getElementById('banDate').textContent = banData.bannedAt ? new Date(banData.bannedAt).toLocaleString() : '-';
         document.getElementById('banReason').textContent = banData.reason || 'Aktivitas mencurigakan terdeteksi.';
-        
-        // Risk
         const risk = banData.risk || 35;
         const riskBar = document.getElementById('banRiskBar');
         const riskText = document.getElementById('banRiskText');
@@ -464,8 +356,6 @@
         else if (risk < 60) { riskText.textContent = 'MEDIUM'; riskText.style.color = '#fbbf24'; }
         else if (risk < 85) { riskText.textContent = 'HIGH'; riskText.style.color = '#fb7185'; }
         else { riskText.textContent = 'CRITICAL'; riskText.style.color = '#ef4444'; }
-        
-        // Possibilities
         const poss = document.getElementById('banPossibilities');
         let items = [];
         if ((banData.attempts || 0) >= 5) items.push('Terlalu banyak percobaan login gagal (auto-ban)');
@@ -475,42 +365,21 @@
         if (banData.reason && banData.reason.toLowerCase().includes('waf')) items.push('Diblokir oleh Web Application Firewall (WAF)');
         if (items.length === 0) { items.push('Aktivitas mencurigakan terdeteksi dari IP Anda'); items.push('Diblokir oleh sistem keamanan otomatis'); }
         poss.innerHTML = items.map(item => `<li>${item}</li>`).join('');
-        
         overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
-    
-    function hideBanOverlay() {
-        document.getElementById('banOverlay').classList.remove('active');
-        document.body.style.overflow = '';
-    }
-    
-    // ============================================================
-    // CHECK BAN STATUS
-    // ============================================================
+    function hideBanOverlay() { document.getElementById('banOverlay').classList.remove('active'); document.body.style.overflow = ''; }
     async function checkBanStatus() {
         try {
             const res = await fetch('/api/ban-status', { credentials: 'include' });
             const data = await res.json();
-            if (data.isBanned) {
-                showBanOverlay(data);
-                return true;
-            }
+            if (data.isBanned) { showBanOverlay(data); return true; }
             return false;
-        } catch (error) {
-            console.error('Check ban error:', error);
-            return false;
-        }
+        } catch { return false; }
     }
-    
-    // ============================================================
-    // AUTO CHECK SESSION + BAN
-    // ============================================================
     async function autoCheckSession() {
-        // Cek ban dulu
         const banned = await checkBanStatus();
         if (banned) return;
-        
         const statusEl = document.getElementById('gatewayStatus');
         statusEl.textContent = '⏳ Memeriksa session...';
         statusEl.className = 'gateway-status';
@@ -528,19 +397,17 @@
                 statusEl.className = 'gateway-status expired';
                 setTimeout(() => showVerify(), 600);
             }
-        } catch (error) {
+        } catch {
             statusEl.textContent = '❌ Error';
             statusEl.className = 'gateway-status expired';
             setTimeout(() => showVerify(), 800);
         }
     }
-    
     function showVerify() {
         document.getElementById('gatewaySection').style.display = 'none';
         document.getElementById('verifySection').style.display = 'flex';
         loadCaptcha();
     }
-    
     function enterChat(username) {
         document.getElementById('gatewaySection').style.display = 'none';
         document.getElementById('verifySection').style.display = 'none';
@@ -558,8 +425,6 @@
         updateOnlineUsers();
         if (isDeveloper) startWafPolling();
     }
-    
-    // ===== CAPTCHA =====
     async function loadCaptcha() {
         try {
             const res = await fetch('/api/captcha');
@@ -573,7 +438,6 @@
             document.getElementById('captchaId').value = 'fallback-' + Date.now();
         }
     }
-    
     async function verifyCaptcha() {
         if (isVerifying) return;
         isVerifying = true;
@@ -590,21 +454,14 @@
                 body: JSON.stringify({ telegramUsername: username, answer, captchaId })
             });
             const data = await res.json();
-            
-            // Cek kalo response ban
             if (data.error === 'BANNED' || data.error === 'AUTO_BANNED') {
-                if (data.banData) {
-                    showBanOverlay(data.banData);
-                } else {
-                    // Cek ulang status ban
-                    await checkBanStatus();
-                }
+                if (data.banData) showBanOverlay(data.banData);
+                else await checkBanStatus();
                 isVerifying = false;
                 btn.disabled = false;
                 btn.textContent = '🚀 Verifikasi';
                 return;
             }
-            
             if (data.success) {
                 isDeveloper = data.isDeveloper || false;
                 enterChat(username);
@@ -616,14 +473,11 @@
         btn.disabled = false; btn.textContent = '🚀 Verifikasi';
         isVerifying = false;
     }
-    
-    // ===== DEVELOPER LOGIN =====
     function toggleDeveloperLogin() {
         const section = document.getElementById('developerLoginSection');
         section.classList.toggle('active');
         if (section.classList.contains('active')) document.getElementById('developerUsername').focus();
     }
-    
     async function developerLogin() {
         const username = document.getElementById('developerUsername').value.trim();
         const password = document.getElementById('developerPassword').value.trim();
@@ -642,8 +496,6 @@
             } else { showError(data.error || 'Login gagal!'); }
         } catch (error) { showError('Error: ' + error.message); }
     }
-    
-    // ===== MESSAGES =====
     async function sendMessage() {
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
@@ -655,18 +507,12 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message })
             });
-            
-            // Cek kalo response ban
             if (res.status === 403) {
                 const data = await res.json();
-                if (data.banData) {
-                    showBanOverlay(data.banData);
-                } else {
-                    await checkBanStatus();
-                }
+                if (data.banData) showBanOverlay(data.banData);
+                else await checkBanStatus();
                 return;
             }
-            
             if (!res.ok) {
                 const data = await res.json();
                 if (res.status === 401) { showError('Session expired. Login ulang.'); logout(); return; }
@@ -677,7 +523,6 @@
             loadMessages();
         } catch (error) { showError('Error: ' + error.message); }
     }
-    
     async function loadMessages() {
         try {
             const res = await fetch('/api/chat/messages');
@@ -693,7 +538,6 @@
             if (isDeveloper) document.getElementById('statMessages').textContent = data.messages.length;
         } catch (error) { console.error('Load messages error:', error); }
     }
-    
     function renderMessages(messages) {
         const container = document.getElementById('messages');
         if (!messages || messages.length === 0) {
@@ -713,8 +557,6 @@
         container.innerHTML = html;
         container.scrollTop = container.scrollHeight;
     }
-    
-    // ===== CLEAR MESSAGES =====
     async function clearMessages() {
         if (!confirm('⚠️ Yakin mau hapus semua pesan?')) return;
         try {
@@ -729,8 +571,6 @@
             else { showError(data.error || 'Gagal hapus pesan'); }
         } catch (error) { showError('Error: ' + error.message); }
     }
-    
-    // ===== TYPING =====
     document.getElementById('chatInput').addEventListener('input', function() {
         const indicator = document.getElementById('typingIndicator');
         const isTyping = this.value.length > 0;
@@ -743,7 +583,6 @@
             credentials: 'include'
         }).catch(() => {});
     });
-    
     function startTypingPolling() {
         if (typingInterval) clearInterval(typingInterval);
         typingInterval = setInterval(async () => {
@@ -768,8 +607,6 @@
             } catch {}
         }, 3000);
     }
-    
-    // ===== ONLINE USERS =====
     async function updateOnlineUsers() {
         try {
             const res = await fetch('/api/online-users', { credentials: 'include' });
@@ -786,8 +623,6 @@
             }
         } catch {}
     }
-    
-    // ===== DEVELOPER DASHBOARD =====
     function toggleDeveloperDashboard() {
         const dashboard = document.getElementById('developerDashboard');
         dashboard.classList.toggle('active');
@@ -796,7 +631,6 @@
             if (document.getElementById('devTabWaf').classList.contains('active')) loadWafStats();
         }
     }
-    
     function showDevTab(tab) {
         document.querySelectorAll('.dev-tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.dev-tabs .btn').forEach(el => el.classList.remove('active'));
@@ -809,7 +643,6 @@
         if (tab === 'stats') loadDeveloperStats();
         if (tab === 'waf') loadWafStats();
     }
-    
     async function loadDeveloperStats() {
         try {
             const res = await fetch('/api/test-security', { credentials: 'include' });
@@ -822,8 +655,6 @@
             if (data.success) document.getElementById('statBlocked').textContent = data.totalBanned || 0;
         } catch {}
     }
-    
-    // ===== WAF STATS =====
     async function loadWafStats() {
         try {
             const res = await fetch('/api/waf-stats', { credentials: 'include' });
@@ -843,7 +674,6 @@
             }
         } catch (error) { console.error('WAF stats error:', error); }
     }
-    
     function renderWafChart(history) {
         const container = document.getElementById('wafChart');
         if (!history || history.length === 0) {
@@ -860,7 +690,6 @@
         });
         container.innerHTML = html;
     }
-    
     function startWafPolling() {
         if (wafInterval) clearInterval(wafInterval);
         wafInterval = setInterval(() => {
@@ -869,8 +698,6 @@
             }
         }, 5000);
     }
-    
-    // ===== IP CONTROL =====
     async function loadIpList() {
         const container = document.getElementById('ipListContainer');
         container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:10px;font-size:0.6rem;">⏳ Loading IP list...</div>';
@@ -907,16 +734,13 @@
             container.innerHTML = `<div style="color:#fb7185;text-align:center;padding:10px;font-size:0.6rem;">❌ Error: ${error.message}</div>`;
         }
     }
-    
     async function banIp() {
         const ip = document.getElementById('banIpInput').value.trim();
         if (!ip) { showError('Masukkan IP address!'); return; }
         await banIpManual(ip);
     }
-    
     async function banIpManual(ip) {
         if (!confirm(`🚫 Yakin mau ban IP ${ip}?`)) return;
-        
         try {
             const res = await fetch('/api/ban-ip', {
                 method: 'POST',
@@ -924,34 +748,23 @@
                 body: JSON.stringify({ ip, reason: 'Diblokir oleh admin' }),
                 credentials: 'include'
             });
-            
             const data = await res.json();
-            
             if (data.success) {
                 showError(`✅ ${data.message}`);
-                if (data.selfBan && data.banData) {
-                    showBanOverlay(data.banData);
-                } else {
-                    loadIpList();
-                    loadDeveloperStats();
-                }
+                if (data.selfBan && data.banData) showBanOverlay(data.banData);
+                else { loadIpList(); loadDeveloperStats(); }
             } else {
                 showError(data.error || 'Gagal ban IP');
             }
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
+        } catch (error) { showError('Error: ' + error.message); }
     }
-    
     async function unbanIp() {
         const ip = document.getElementById('banIpInput').value.trim();
         if (!ip) { showError('Masukkan IP address!'); return; }
         await unbanIpManual(ip);
     }
-    
     async function unbanIpManual(ip) {
         if (!confirm(`✅ Yakin mau unban IP ${ip}?`)) return;
-        
         try {
             const res = await fetch('/api/unban-ip', {
                 method: 'POST',
@@ -960,21 +773,12 @@
                 credentials: 'include'
             });
             const data = await res.json();
-            if (data.success) {
-                showError(`✅ ${data.message}`);
-                loadIpList();
-                loadDeveloperStats();
-            } else {
-                showError(data.error || 'Gagal unban IP');
-            }
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
+            if (data.success) { showError(`✅ ${data.message}`); loadIpList(); loadDeveloperStats(); }
+            else { showError(data.error || 'Gagal unban IP'); }
+        } catch (error) { showError('Error: ' + error.message); }
     }
-    
     async function deleteIpHistory(ip) {
         if (!confirm(`⚠️ Yakin mau hapus IP ${ip} dari history?`)) return;
-        
         try {
             const res = await fetch('/api/delete-ip', {
                 method: 'DELETE',
@@ -983,22 +787,13 @@
                 credentials: 'include'
             });
             const data = await res.json();
-            if (data.success) {
-                showError(`✅ ${data.message}`);
-                loadIpList();
-            } else {
-                if (data.isBanned) {
-                    showError('❌ IP ini masih diban! Unban dulu sebelum menghapus.');
-                } else {
-                    showError(data.error || 'Gagal hapus IP');
-                }
+            if (data.success) { showError(`✅ ${data.message}`); loadIpList(); }
+            else {
+                if (data.isBanned) showError('❌ IP ini masih diban! Unban dulu sebelum menghapus.');
+                else showError(data.error || 'Gagal hapus IP');
             }
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
+        } catch (error) { showError('Error: ' + error.message); }
     }
-    
-    // ===== SECURITY TEST =====
     async function testSecurity() {
         const result = document.getElementById('securityTestResult');
         result.style.display = 'block';
@@ -1027,21 +822,15 @@
         }
         setTimeout(() => { result.style.display = 'none'; }, 6000);
     }
-    
-    // ===== LOGOUT =====
     async function logout() {
         await fetch('/api/logout', { method: 'POST' });
         document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         location.reload();
     }
-    
-    // ===== AUTO REFRESH =====
     function startAutoRefresh() {
         if (refreshInterval) clearInterval(refreshInterval);
         refreshInterval = setInterval(() => { loadMessages(); updateOnlineUsers(); }, 3000);
     }
-    
-    // ===== ERROR =====
     function showError(msg) {
         const el = document.getElementById('errorMsg');
         el.textContent = msg;
@@ -1049,17 +838,13 @@
         setTimeout(() => { el.style.display = 'none'; }, 5000);
     }
     function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
-    
-    // ===== ENTER =====
     document.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             if (document.getElementById('chatSection').style.display === 'flex') sendMessage();
             else if (document.getElementById('verifySection').style.display === 'flex') verifyCaptcha();
         }
     });
-    
-    // ===== INIT =====
     window.onload = autoCheckSession;
 </script>
 </body>
-    </html>
+</html>
