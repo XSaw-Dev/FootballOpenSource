@@ -1,67 +1,75 @@
-// ===== ADVANCED WAF =====
+// ================================================================
+// WAF MODULE - api/modules/waf.js
+// ================================================================
 const redis = require('./redis');
 const { RATE_LIMITS, ATTACK_LOG_LIMIT } = require('./config');
 const rateLimit = require('express-rate-limit');
 
 // ===== MALICIOUS PATTERNS =====
 const patterns = [
-  // SQL Injection
   /(\bSELECT\b.*\bFROM\b|\bINSERT\b.*\bINTO\b|\bUPDATE\b.*\bSET\b|\bDELETE\b.*\bFROM\b|\bDROP\b.*\bTABLE\b|\bUNION\b.*\bSELECT\b)/i,
   /('.*\bOR\b.*'='.*'|'.*\bAND\b.*'='.*')/i,
   /(\bEXEC\b.*\bXP_|;\s*SHUTDOWN\b)/i,
   /('|\b1\b\s*=\s*\b1\b|'|\b1\b\s*=\s*\b'1\b)/i,
   /(--\s*.*\b\w+\b|#\s*.*\b\w+\b)/i,
-  
-  // XSS
   /<script\b[^>]*>.*?<\/script>/i,
   /<img\b[^>]*\bonerror\s*=/i,
   /<iframe\b[^>]*\bsrc\s*=/i,
   /javascript\s*:/i,
   /on\w+\s*=\s*['"]?[^'">]*\(/i,
-  
-  // Path Traversal
   /\.\.\/|\.\.\\/,
   /\/etc\/passwd|\/etc\/shadow/i,
-  
-  // Command Injection
   /;\s*rm\s+-rf\s+\//i,
   /;\s*curl\s+.*\s*\|.*\s*sh/i,
   /;\s*wget\s+.*\s*-O\s*/i,
-  
-  // Bot Detection
   /bot|crawler|spider|scraper|curl|wget|python|java|php|ruby|perl|go|nmap|sqlmap|nikto|openvas|metasploit/i,
 ];
 
+// ===== GET REAL IP =====
+function getRealIP(req) {
+  try {
+    return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+           req.headers['x-real-ip'] ||
+           req.headers['cf-connecting-ip'] ||
+           req.headers['true-client-ip'] ||
+           req.ip ||
+           req.connection?.remoteAddress ||
+           '0.0.0.0';
+  } catch {
+    return '0.0.0.0';
+  }
+}
+
 // ===== DETECT FUNCTION =====
 function detectMaliciousRequest(req) {
-  const body = JSON.stringify(req.body || {});
-  const query = JSON.stringify(req.query || {});
-  const params = JSON.stringify(req.params || {});
-  const headers = JSON.stringify(req.headers || {});
-  const userAgent = req.headers['user-agent'] || '';
-  
-  const allData = `${body} ${query} ${params} ${headers} ${userAgent}`;
-  
-  for (const pattern of patterns) {
-    if (pattern.test(allData)) {
-      return { isMalicious: true, pattern: pattern.source };
+  try {
+    const body = JSON.stringify(req.body || {});
+    const query = JSON.stringify(req.query || {});
+    const params = JSON.stringify(req.params || {});
+    const headers = JSON.stringify(req.headers || {});
+    const userAgent = req.headers['user-agent'] || '';
+    
+    const allData = `${body} ${query} ${params} ${headers} ${userAgent}`;
+    
+    for (const pattern of patterns) {
+      if (pattern.test(allData)) {
+        return { isMalicious: true, pattern: pattern.source };
+      }
     }
+    
+    if (Buffer.byteLength(JSON.stringify(req.body), 'utf8') > 100000) {
+      return { isMalicious: true, pattern: 'PAYLOAD_SIZE_EXCEEDED' };
+    }
+    
+    return { isMalicious: false };
+  } catch {
+    return { isMalicious: false };
   }
-  
-  if (Buffer.byteLength(JSON.stringify(req.body), 'utf8') > 100000) {
-    return { isMalicious: true, pattern: 'PAYLOAD_SIZE_EXCEEDED' };
-  }
-  
-  if (/bot|crawler|spider|scraper|curl|wget|python|java|php|ruby|perl|go/i.test(userAgent)) {
-    return { isMalicious: true, pattern: 'BOT_DETECTED' };
-  }
-  
-  return { isMalicious: false };
 }
 
 // ===== WAF MIDDLEWARE =====
 async function wafMiddleware(req, res, next) {
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || '0.0.0.0';
+  const ip = getRealIP(req);
   
   if (req.path.startsWith('/_next/') || req.path.startsWith('/static/') || req.path === '/favicon.ico') {
     return next();
