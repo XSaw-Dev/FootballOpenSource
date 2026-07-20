@@ -1,4 +1,6 @@
-// ===== AUTH & SESSION =====
+// ================================================================
+// AUTH MODULE - api/modules/auth.js
+// ================================================================
 const redis = require('./redis');
 const { SESSION_EXPIRY, CAPTCHA_EXPIRY, MAX_ATTEMPTS, BAN_EXPIRY } = require('./config');
 const crypto = require('crypto');
@@ -7,21 +9,27 @@ const path = require('path');
 
 // ===== GET REAL IP =====
 function getRealIP(req) {
-  return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-         req.headers['x-real-ip'] ||
-         req.headers['cf-connecting-ip'] ||
-         req.headers['true-client-ip'] ||
-         req.ip ||
-         req.connection?.remoteAddress ||
-         '0.0.0.0';
+  try {
+    return req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+           req.headers['x-real-ip'] ||
+           req.headers['cf-connecting-ip'] ||
+           req.headers['true-client-ip'] ||
+           req.ip ||
+           req.connection?.remoteAddress ||
+           '0.0.0.0';
+  } catch {
+    return '0.0.0.0';
+  }
 }
 
 // ===== LOAD DEVELOPER DATA =====
 function getDeveloperData() {
   try {
-    const data = fs.readFileSync(path.join(__dirname, '../developer.json'), 'utf8');
+    const filePath = path.join(__dirname, '../developer.json');
+    const data = fs.readFileSync(filePath, 'utf8');
     return JSON.parse(data);
-  } catch {
+  } catch (error) {
+    console.error('❌ Gagal baca developer.json:', error.message);
     return { username: 'I7ZX', password: 'GueYangBikin' };
   }
 }
@@ -32,10 +40,64 @@ function generateSessionSignature(username, ip, userAgent, timestamp) {
   return crypto.createHash('sha256').update(raw).digest('hex');
 }
 
-// ===== SESSION MIDDLEWARE =====
+// ================================================================
+// SESSION MIDDLEWARE (FIXED - PAKE TRY-CATCH)
+// ================================================================
 async function checkSession(req, res, next) {
   try {
-    const sessionId = req.cookies.sessionId;
+    const sessionId = req.cookies?.sessionId;
+    
+    if (!sessionId) {
+      return res.status(401).json({ 
+        error: 'NO_SESSION', 
+        message: 'Belum login atau session tidak ditemukan.' 
+      });
+    }
+    
+    const sessionData = await redis.get(`session:${sessionId}`);
+    if (!sessionData) {
+      res.clearCookie('sessionId');
+      return res.status(401).json({ 
+        error: 'SESSION_EXPIRED', 
+        message: 'Session expired. Silahkan login ulang.' 
+      });
+    }
+    
+    const session = JSON.parse(sessionData);
+    const ip = getRealIP(req);
+    const userAgent = req.headers['user-agent'] || '';
+    
+    // Validasi IP
+    if (session.ip && session.ip !== ip) {
+      await redis.del(`session:${sessionId}`);
+      res.clearCookie('sessionId');
+      return res.status(401).json({ error: 'IP_MISMATCH', message: 'IP berbeda dengan session.' });
+    }
+    
+    // Validasi User-Agent
+    if (session.userAgent && session.userAgent !== userAgent) {
+      await redis.del(`session:${sessionId}`);
+      res.clearCookie('sessionId');
+      return res.status(401).json({ error: 'DEVICE_MISMATCH', message: 'Device berbeda.' });
+    }
+    
+    // Refresh session (perpanjang)
+    await redis.expire(`session:${sessionId}`, SESSION_EXPIRY);
+    
+    req.session = session;
+    next();
+  } catch (error) {
+    console.error('❌ Check session error:', error.message);
+    return res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Terjadi kesalahan saat verifikasi session.' });
+  }
+}
+
+// ================================================================
+// DEVELOPER MIDDLEWARE
+// ================================================================
+async function checkDeveloper(req, res, next) {
+  try {
+    const sessionId = req.cookies?.sessionId;
     if (!sessionId) {
       return res.status(401).json({ error: 'NO_SESSION', message: 'Belum login.' });
     }
@@ -47,65 +109,26 @@ async function checkSession(req, res, next) {
     }
     
     const session = JSON.parse(sessionData);
-    const ip = getRealIP(req);
-    const userAgent = req.headers['user-agent'] || '';
-    
-    if (session.ip && session.ip !== ip) {
-      await redis.del(`session:${sessionId}`);
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'IP_MISMATCH' });
-    }
-    
-    if (session.userAgent && session.userAgent !== userAgent) {
-      await redis.del(`session:${sessionId}`);
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'DEVICE_MISMATCH' });
-    }
-    
-    req.session = session;
-    next();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-// ===== DEVELOPER MIDDLEWARE =====
-async function checkDeveloper(req, res, next) {
-  try {
-    const sessionId = req.cookies.sessionId;
-    if (!sessionId) {
-      return res.status(401).json({ error: 'NO_SESSION' });
-    }
-    
-    const sessionData = await redis.get(`session:${sessionId}`);
-    if (!sessionData) {
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'SESSION_EXPIRED' });
-    }
-    
-    const session = JSON.parse(sessionData);
     const developer = getDeveloperData();
-    const ip = getRealIP(req);
-    const userAgent = req.headers['user-agent'] || '';
     
     if (!session.isDeveloper || session.username !== developer.username) {
-      return res.status(403).json({ error: 'Akses ditolak. Hanya untuk developer.' });
+      return res.status(403).json({ error: 'FORBIDDEN', message: 'Akses ditolak. Hanya untuk developer.' });
     }
     
-    if (session.ip && session.ip !== ip) {
-      await redis.del(`session:${sessionId}`);
-      res.clearCookie('sessionId');
-      return res.status(401).json({ error: 'IP_MISMATCH' });
-    }
+    // Refresh session
+    await redis.expire(`session:${sessionId}`, SESSION_EXPIRY);
     
     req.session = session;
     next();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Check developer error:', error.message);
+    return res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Terjadi kesalahan.' });
   }
 }
 
-// ===== CAPTCHA =====
+// ================================================================
+// CAPTCHA
+// ================================================================
 async function generateCaptcha(req, res) {
   try {
     const captchaId = Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
@@ -121,6 +144,7 @@ async function generateCaptcha(req, res) {
       question: `${num1} + ${num2} = ?`
     });
   } catch (error) {
+    console.error('❌ Generate captcha error:', error.message);
     res.json({
       success: true,
       captchaId: 'fallback-' + Date.now(),
@@ -129,7 +153,9 @@ async function generateCaptcha(req, res) {
   }
 }
 
-// ===== VERIFY CAPTCHA =====
+// ================================================================
+// VERIFY CAPTCHA
+// ================================================================
 async function verifyCaptcha(req, res) {
   const ip = getRealIP(req);
   const userAgent = req.headers['user-agent'] || '';
@@ -141,15 +167,18 @@ async function verifyCaptcha(req, res) {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
     
+    // Cek ban
     const redisBan = await redis.get(`ban:${ip}`);
     if (redisBan) {
       const banData = JSON.parse(redisBan);
       return res.status(403).json({ 
         error: 'BANNED',
+        message: 'IP Anda telah diblokir.',
         redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=${encodeURIComponent(banData.reason || 'Diblokir oleh admin')}`
       });
     }
     
+    // Verifikasi captcha
     let verified = false;
     if (captchaId.startsWith('fallback-')) {
       verified = true;
@@ -161,6 +190,7 @@ async function verifyCaptcha(req, res) {
     }
     
     if (!verified) {
+      // Update attempts
       const existing = await redis.get(`ip:${ip}`);
       let data = existing ? JSON.parse(existing) : { firstSeen: new Date().toISOString(), attempts: 0 };
       data.attempts = (data.attempts || 0) + 1;
@@ -168,6 +198,7 @@ async function verifyCaptcha(req, res) {
       
       await redis.setex(`ip:${ip}`, BAN_EXPIRY, JSON.stringify(data));
       
+      // Auto-ban kalo 5 attempts
       if (data.attempts >= MAX_ATTEMPTS) {
         await redis.setex(`ban:${ip}`, BAN_EXPIRY, JSON.stringify({
           bannedAt: new Date().toISOString(),
@@ -175,13 +206,15 @@ async function verifyCaptcha(req, res) {
         }));
         return res.status(429).json({ 
           error: 'AUTO_BANNED',
-          redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=Auto-ban: too many attempts&attempts=${data.attempts}&risk=85`
+          message: 'IP Anda diblokir otomatis.',
+          redirect: `/ban.html?ip=${encodeURIComponent(ip)}&reason=Auto-ban: too many attempts`
         });
       }
       
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
     
+    // Reset attempts
     const existing = await redis.get(`ip:${ip}`);
     if (existing) {
       const data = JSON.parse(existing);
@@ -189,6 +222,7 @@ async function verifyCaptcha(req, res) {
       await redis.setex(`ip:${ip}`, BAN_EXPIRY, JSON.stringify(data));
     }
     
+    // Buat session
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
     const timestamp = Date.now();
     const developer = getDeveloperData();
@@ -212,13 +246,20 @@ async function verifyCaptcha(req, res) {
       maxAge: SESSION_EXPIRY * 1000
     });
     
-    res.json({ success: true, isDeveloper });
+    res.json({ 
+      success: true, 
+      message: '✅ Verifikasi berhasil!',
+      isDeveloper: isDeveloper
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Verify captcha error:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan saat verifikasi.' });
   }
 }
 
-// ===== DEVELOPER LOGIN =====
+// ================================================================
+// DEVELOPER LOGIN
+// ================================================================
 async function developerLogin(req, res) {
   const ip = getRealIP(req);
   const userAgent = req.headers['user-agent'] || '';
@@ -249,14 +290,18 @@ async function developerLogin(req, res) {
       res.status(401).json({ error: 'Username atau password salah!' });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Developer login error:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan.' });
   }
 }
 
-// ===== CHECK SESSION =====
+// ================================================================
+// CHECK SESSION API (FIXED - PAKE TRY-CATCH)
+// ================================================================
 async function checkSessionAPI(req, res) {
   try {
-    const sessionId = req.cookies.sessionId;
+    const sessionId = req.cookies?.sessionId;
+    
     if (!sessionId) {
       return res.json({ valid: false, error: 'NO_SESSION' });
     }
@@ -271,6 +316,7 @@ async function checkSessionAPI(req, res) {
     const ip = getRealIP(req);
     const userAgent = req.headers['user-agent'] || '';
     
+    // Validasi cepat
     if (session.ip && session.ip !== ip) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
@@ -283,21 +329,35 @@ async function checkSessionAPI(req, res) {
       return res.json({ valid: false, error: 'DEVICE_MISMATCH' });
     }
     
-    res.json({ valid: true, username: session.username, isDeveloper: session.isDeveloper || false });
+    // Refresh session
+    await redis.expire(`session:${sessionId}`, SESSION_EXPIRY);
+    
+    res.json({ 
+      valid: true, 
+      username: session.username,
+      isDeveloper: session.isDeveloper || false,
+      expiresAt: session.expiresAt
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Check session API error:', error.message);
+    res.json({ valid: false, error: 'INTERNAL_ERROR' });
   }
 }
 
-// ===== LOGOUT =====
+// ================================================================
+// LOGOUT
+// ================================================================
 async function logout(req, res) {
   try {
-    const sessionId = req.cookies.sessionId;
-    if (sessionId) await redis.del(`session:${sessionId}`);
+    const sessionId = req.cookies?.sessionId;
+    if (sessionId) {
+      await redis.del(`session:${sessionId}`);
+    }
     res.clearCookie('sessionId');
     res.json({ success: true, message: 'Logout berhasil.' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('❌ Logout error:', error.message);
+    res.status(500).json({ error: 'Terjadi kesalahan.' });
   }
 }
 
