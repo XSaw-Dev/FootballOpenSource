@@ -41,7 +41,7 @@ function generateSessionSignature(username, ip, userAgent, timestamp) {
 }
 
 // ================================================================
-// SESSION MIDDLEWARE (FIXED - PAKE TRY-CATCH)
+// SESSION MIDDLEWARE
 // ================================================================
 async function checkSession(req, res, next) {
   try {
@@ -67,21 +67,18 @@ async function checkSession(req, res, next) {
     const ip = getRealIP(req);
     const userAgent = req.headers['user-agent'] || '';
     
-    // Validasi IP
     if (session.ip && session.ip !== ip) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
       return res.status(401).json({ error: 'IP_MISMATCH', message: 'IP berbeda dengan session.' });
     }
     
-    // Validasi User-Agent
     if (session.userAgent && session.userAgent !== userAgent) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
       return res.status(401).json({ error: 'DEVICE_MISMATCH', message: 'Device berbeda.' });
     }
     
-    // Refresh session (perpanjang)
     await redis.expire(`session:${sessionId}`, SESSION_EXPIRY);
     
     req.session = session;
@@ -115,7 +112,6 @@ async function checkDeveloper(req, res, next) {
       return res.status(403).json({ error: 'FORBIDDEN', message: 'Akses ditolak. Hanya untuk developer.' });
     }
     
-    // Refresh session
     await redis.expire(`session:${sessionId}`, SESSION_EXPIRY);
     
     req.session = session;
@@ -167,7 +163,6 @@ async function verifyCaptcha(req, res) {
       return res.status(400).json({ error: 'Semua field wajib diisi!' });
     }
     
-    // Cek ban
     const redisBan = await redis.get(`ban:${ip}`);
     if (redisBan) {
       const banData = JSON.parse(redisBan);
@@ -178,7 +173,6 @@ async function verifyCaptcha(req, res) {
       });
     }
     
-    // Verifikasi captcha
     let verified = false;
     if (captchaId.startsWith('fallback-')) {
       verified = true;
@@ -190,7 +184,6 @@ async function verifyCaptcha(req, res) {
     }
     
     if (!verified) {
-      // Update attempts
       const existing = await redis.get(`ip:${ip}`);
       let data = existing ? JSON.parse(existing) : { firstSeen: new Date().toISOString(), attempts: 0 };
       data.attempts = (data.attempts || 0) + 1;
@@ -198,7 +191,6 @@ async function verifyCaptcha(req, res) {
       
       await redis.setex(`ip:${ip}`, BAN_EXPIRY, JSON.stringify(data));
       
-      // Auto-ban kalo 5 attempts
       if (data.attempts >= MAX_ATTEMPTS) {
         await redis.setex(`ban:${ip}`, BAN_EXPIRY, JSON.stringify({
           bannedAt: new Date().toISOString(),
@@ -214,7 +206,6 @@ async function verifyCaptcha(req, res) {
       return res.status(400).json({ error: 'Captcha salah! Coba lagi.' });
     }
     
-    // Reset attempts
     const existing = await redis.get(`ip:${ip}`);
     if (existing) {
       const data = JSON.parse(existing);
@@ -222,7 +213,6 @@ async function verifyCaptcha(req, res) {
       await redis.setex(`ip:${ip}`, BAN_EXPIRY, JSON.stringify(data));
     }
     
-    // Buat session
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
     const timestamp = Date.now();
     const developer = getDeveloperData();
@@ -296,7 +286,7 @@ async function developerLogin(req, res) {
 }
 
 // ================================================================
-// CHECK SESSION API (FIXED - PAKE TRY-CATCH)
+// CHECK SESSION API
 // ================================================================
 async function checkSessionAPI(req, res) {
   try {
@@ -316,7 +306,6 @@ async function checkSessionAPI(req, res) {
     const ip = getRealIP(req);
     const userAgent = req.headers['user-agent'] || '';
     
-    // Validasi cepat
     if (session.ip && session.ip !== ip) {
       await redis.del(`session:${sessionId}`);
       res.clearCookie('sessionId');
@@ -329,7 +318,6 @@ async function checkSessionAPI(req, res) {
       return res.json({ valid: false, error: 'DEVICE_MISMATCH' });
     }
     
-    // Refresh session
     await redis.expire(`session:${sessionId}`, SESSION_EXPIRY);
     
     res.json({ 
