@@ -5,10 +5,6 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/ban.html",
-      "destination": "/public/ban.html"
-    },
-    {
       "source": "/(.*)",
       "destination": "/public/index.html"
     }
