@@ -1,10 +1,12 @@
-// ===== MAIN ENTRY =====
+// ================================================================
+// MAIN ENTRY - api/index.js
+// ================================================================
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 
-// ===== IMPORT MODULES =====
+// ===== IMPORT MODULES (PAKE PATH LENGKAP) =====
 const redis = require('./modules/redis');
 const { 
   wafMiddleware, 
@@ -81,6 +83,12 @@ app.get('/api/ping', async (req, res) => {
   } catch (error) {
     res.status(500).json({ status: '❌ Redis Error', error: error.message });
   }
+});
+
+// ===== ERROR HANDLING GLOBAL =====
+app.use((err, req, res, next) => {
+  console.error('❌ Global error:', err.message);
+  res.status(500).json({ error: 'Terjadi kesalahan server.', message: err.message });
 });
 
 module.exports = app;
