@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ CYBER CHAT PREMIUM</title>
     <style>
+        /* ===== RESET & BASE ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #0a0a14;
@@ -15,383 +15,230 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-image: 
-                radial-gradient(ellipse at 50% 0%, rgba(88, 50, 200, 0.06) 0%, transparent 70%),
-                radial-gradient(ellipse at 80% 100%, rgba(50, 200, 200, 0.03) 0%, transparent 50%);
+            background-image: radial-gradient(ellipse at 50% 0%, rgba(88,50,200,0.06) 0%, transparent 70%);
+            overflow: hidden;
         }
-        
-        .container {
-            width: 100%;
-            max-width: 920px;
-            padding: 16px;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        
+        .container { width: 100%; max-width: 960px; padding: 16px; height: 100vh; display: flex; align-items: center; }
         .chat-card {
-            background: rgba(16, 16, 30, 0.94);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(16,16,30,0.94);
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 24px;
-            padding: 28px 30px 24px;
+            padding: 24px 28px 20px;
             width: 100%;
             backdrop-filter: blur(24px);
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
-            height: 92vh;
-            max-height: 780px;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+            height: 94vh;
+            max-height: 800px;
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
         }
-        
-        .chat-title {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #a78bfa, #8b5cf6, #6d28d9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2px;
-            flex-shrink: 0;
-            letter-spacing: 1px;
-        }
-        
-        .chat-subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.1);
-            font-size: 0.6rem;
-            letter-spacing: 5px;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-            flex-shrink: 0;
-        }
+        .chat-title { text-align: center; font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #a78bfa, #8b5cf6, #6d28d9); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 2px; flex-shrink: 0; letter-spacing: 1px; }
+        .chat-subtitle { text-align: center; color: rgba(255,255,255,0.08); font-size: 0.55rem; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 14px; flex-shrink: 0; }
         
         /* ===== GATEWAY ===== */
-        #gatewaySection {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            text-align: center;
-            gap: 12px;
-        }
-        
+        #gatewaySection { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; gap: 12px; }
         .gateway-icon { font-size: 3.6rem; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .gateway-title { font-size: 1.3rem; font-weight: 600; color: #e0e0e0; }
-        .gateway-desc { color: rgba(255, 255, 255, 0.15); font-size: 0.7rem; letter-spacing: 2px; }
-        
-        .gateway-status {
-            padding: 8px 22px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 30px;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.25);
-            min-width: 180px;
-        }
-        .gateway-status.valid { border-color: rgba(52, 211, 153, 0.25); color: #34d399; }
-        .gateway-status.expired { border-color: rgba(251, 113, 133, 0.2); color: #fb7185; }
+        .gateway-desc { color: rgba(255,255,255,0.12); font-size: 0.7rem; letter-spacing: 2px; }
+        .gateway-status { padding: 8px 22px; border: 1px solid rgba(255,255,255,0.06); border-radius: 30px; font-size: 0.75rem; color: rgba(255,255,255,0.25); min-width: 180px; }
+        .gateway-status.valid { border-color: rgba(52,211,153,0.25); color: #34d399; }
+        .gateway-status.expired { border-color: rgba(251,113,133,0.2); color: #fb7185; }
         
         /* ===== VERIFIKASI ===== */
-        #verifySection {
-            display: none;
-            flex-direction: column;
-            gap: 16px;
-            flex: 1;
-            justify-content: center;
-            max-width: 440px;
-            margin: 0 auto;
-            width: 100%;
-        }
+        #verifySection { display: none; flex-direction: column; gap: 14px; flex: 1; justify-content: center; max-width: 440px; margin: 0 auto; width: 100%; }
+        #chatSection { display: none; flex-direction: column; flex: 1; min-height: 0; }
         
-        #chatSection {
-            display: none;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-        }
-        
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        .input-group label { color: rgba(255, 255, 255, 0.3); font-size: 0.7rem; font-weight: 500; letter-spacing: 1px; }
-        
-        .input-field {
-            padding: 12px 16px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            color: #e0e0e0;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .input-field:focus { outline: none; border-color: rgba(139, 92, 246, 0.3); background: rgba(255, 255, 255, 0.06); }
-        .input-field::placeholder { color: rgba(255, 255, 255, 0.08); }
-        
-        .captcha-box {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-        }
+        .input-group { display: flex; flex-direction: column; gap: 5px; }
+        .input-group label { color: rgba(255,255,255,0.25); font-size: 0.7rem; font-weight: 500; letter-spacing: 1px; }
+        .input-field { padding: 11px 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; color: #e0e0e0; font-size: 0.95rem; transition: all 0.3s ease; font-family: inherit; }
+        .input-field:focus { outline: none; border-color: rgba(139,92,246,0.3); background: rgba(255,255,255,0.06); }
+        .input-field::placeholder { color: rgba(255,255,255,0.06); }
+        .captcha-box { background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.06); border-radius: 12px; padding: 14px; text-align: center; }
         .captcha-box .question { font-size: 1.8rem; font-weight: 600; color: #a78bfa; }
-        .captcha-box .hint { color: rgba(255, 255, 255, 0.08); font-size: 0.6rem; margin-top: 4px; letter-spacing: 2px; }
+        .captcha-box .hint { color: rgba(255,255,255,0.06); font-size: 0.55rem; margin-top: 4px; letter-spacing: 2px; }
         
-        .btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(139, 92, 246, 0.2); }
+        .btn { padding: 11px 20px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none; border-radius: 12px; color: white; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: inherit; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(139,92,246,0.2); }
         .btn:active { transform: translateY(0); }
         .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.06); }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
-        .btn-sm { padding: 6px 14px; font-size: 0.7rem; border-radius: 8px; }
+        .btn-secondary { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.08); }
+        .btn-sm { padding: 5px 12px; font-size: 0.65rem; border-radius: 8px; }
         .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .btn-danger:hover { box-shadow: 0 8px 28px rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { box-shadow: 0 8px 28px rgba(239,68,68,0.2); }
         .btn-developer { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-developer:hover { box-shadow: 0 8px 28px rgba(245, 158, 11, 0.2); }
+        .btn-developer:hover { box-shadow: 0 8px 28px rgba(245,158,11,0.2); }
         .btn-clear { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-        .btn-clear:hover { box-shadow: 0 8px 28px rgba(139, 92, 246, 0.2); }
+        .btn-clear:hover { box-shadow: 0 8px 28px rgba(139,92,246,0.2); }
         .btn-success { background: linear-gradient(135deg, #34d399, #10b981); }
-        .btn-success:hover { box-shadow: 0 8px 28px rgba(52, 211, 153, 0.2); }
+        .btn-success:hover { box-shadow: 0 8px 28px rgba(52,211,153,0.2); }
+        .btn-waf { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+        .btn-waf:hover { box-shadow: 0 8px 28px rgba(59,130,246,0.2); }
         
-        /* ===== DEVELOPER LOGIN ===== */
-        #developerLoginSection {
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            padding: 16px;
-            border: 1px solid rgba(245, 158, 11, 0.12);
-            border-radius: 12px;
-            background: rgba(245, 158, 11, 0.02);
-            margin-top: 8px;
-        }
+        #developerLoginSection { display: none; flex-direction: column; gap: 10px; padding: 14px; border: 1px solid rgba(245,158,11,0.1); border-radius: 12px; background: rgba(245,158,11,0.02); margin-top: 8px; }
         #developerLoginSection.active { display: flex; }
-        
         .developer-toggle { text-align: center; margin-top: 8px; }
-        .developer-toggle button { background: none; border: none; color: rgba(255, 255, 255, 0.12); font-size: 0.65rem; cursor: pointer; text-decoration: underline; font-family: inherit; }
-        .developer-toggle button:hover { color: rgba(255, 255, 255, 0.25); }
+        .developer-toggle button { background: none; border: none; color: rgba(255,255,255,0.1); font-size: 0.6rem; cursor: pointer; text-decoration: underline; font-family: inherit; }
+        .developer-toggle button:hover { color: rgba(255,255,255,0.2); }
         
         /* ===== CHAT ===== */
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            flex-wrap: wrap;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        
-        .chat-user { color: rgba(255, 255, 255, 0.2); font-size: 0.75rem; }
+        .chat-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+        .chat-user { color: rgba(255,255,255,0.2); font-size: 0.7rem; }
         .chat-user span { color: #a78bfa; font-weight: 600; }
-        .chat-user .badge-developer {
-            display: inline-block;
-            background: #3b82f6;
-            color: white;
-            font-size: 0.5rem;
-            padding: 2px 10px;
-            border-radius: 12px;
-            margin-left: 6px;
-            font-weight: 600;
-        }
-        
-        .chat-status { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .status-online { color: #34d399; font-size: 0.65rem; display: flex; align-items: center; gap: 4px; }
+        .chat-user .badge-developer { display: inline-block; background: #3b82f6; color: white; font-size: 0.45rem; padding: 1px 8px; border-radius: 10px; margin-left: 6px; font-weight: 600; }
+        .chat-status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .status-online { color: #34d399; font-size: 0.6rem; display: flex; align-items: center; gap: 4px; }
         .status-online .dot { width: 5px; height: 5px; border-radius: 50%; background: #34d399; animation: pulse-dot 2s infinite; }
-        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .online-count { color: rgba(255, 255, 255, 0.1); font-size: 0.65rem; }
-        .chat-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .online-count { color: rgba(255,255,255,0.08); font-size: 0.6rem; }
+        .chat-actions { display: flex; gap: 5px; flex-wrap: wrap; }
         
-        /* ===== MESSAGES ===== */
-        #messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 8px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.02);
-            margin: 10px 0;
-            min-height: 0;
-        }
+        #messages { flex: 1; overflow-y: auto; padding: 10px 6px; background: rgba(255,255,255,0.01); border-radius: 12px; border: 1px solid rgba(255,255,255,0.02); margin: 8px 0; min-height: 0; }
         #messages::-webkit-scrollbar { width: 3px; }
-        #messages::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.01); }
-        #messages::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.2); border-radius: 10px; }
-        
-        .message {
-            padding: 8px 12px;
-            margin-bottom: 4px;
-            background: rgba(255, 255, 255, 0.02);
-            border-left: 3px solid rgba(139, 92, 246, 0.15);
-            border-radius: 6px;
-            animation: fadeIn 0.25s ease-out;
-        }
-        .message.developer { border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.04); }
-        
+        #messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.01); }
+        #messages::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.15); border-radius: 10px; }
+        .message { padding: 7px 10px; margin-bottom: 4px; background: rgba(255,255,255,0.02); border-left: 3px solid rgba(139,92,246,0.12); border-radius: 6px; animation: fadeIn 0.25s ease-out; }
+        .message.developer { border-left-color: #3b82f6; background: rgba(59,130,246,0.04); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .message .msg-user {
-            font-weight: 600;
-            font-size: 0.7rem;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .message .msg-user .dev-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            background: #3b82f6;
-            color: white;
-            font-size: 0.45rem;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-weight: 600;
-        }
+        .message .msg-user { font-weight: 600; font-size: 0.65rem; margin-bottom: 2px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .message .msg-user .dev-badge { display: inline-flex; align-items: center; gap: 3px; background: #3b82f6; color: white; font-size: 0.4rem; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
         .message .msg-text { font-size: 0.85rem; color: #d0d0d0; word-break: break-word; line-height: 1.4; }
-        .message .msg-time { color: rgba(255, 255, 255, 0.04); font-size: 0.45rem; float: right; margin-top: 1px; }
+        .message .msg-time { color: rgba(255,255,255,0.03); font-size: 0.4rem; float: right; margin-top: 1px; }
+        .empty-chat { text-align: center; color: rgba(255,255,255,0.03); padding: 40px 0; font-size: 0.75rem; }
+        .empty-chat .icon { font-size: 2rem; margin-bottom: 6px; opacity: 0.08; }
         
-        .empty-chat { text-align: center; color: rgba(255, 255, 255, 0.03); padding: 50px 0; font-size: 0.8rem; }
-        .empty-chat .icon { font-size: 2.2rem; margin-bottom: 8px; opacity: 0.1; }
-        
-        .typing-indicator {
-            color: rgba(255, 255, 255, 0.06);
-            font-size: 0.65rem;
-            padding: 2px 12px;
-            min-height: 20px;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-        }
-        .typing-indicator.active { color: rgba(139, 92, 246, 0.25); }
-        
-        .chat-input-area {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-            padding-top: 4px;
-            flex-wrap: wrap;
-        }
-        .chat-input-area .input-field { flex: 1; min-width: 120px; padding: 10px 14px; font-size: 0.85rem; }
-        .chat-input-area .btn { padding: 10px 22px; font-size: 0.85rem; flex-shrink: 0; }
+        .typing-indicator { color: rgba(255,255,255,0.05); font-size: 0.6rem; padding: 2px 10px; min-height: 18px; transition: all 0.3s ease; flex-shrink: 0; }
+        .typing-indicator.active { color: rgba(139,92,246,0.2); }
+        .chat-input-area { display: flex; gap: 6px; flex-shrink: 0; padding-top: 4px; flex-wrap: wrap; }
+        .chat-input-area .input-field { flex: 1; min-width: 100px; padding: 9px 12px; font-size: 0.8rem; }
+        .chat-input-area .btn { padding: 9px 18px; font-size: 0.8rem; flex-shrink: 0; }
         
         /* ===== DEVELOPER DASHBOARD ===== */
-        #developerDashboard {
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            padding: 12px 14px;
-            background: rgba(59, 130, 246, 0.02);
-            border: 1px solid rgba(59, 130, 246, 0.06);
-            border-radius: 12px;
-            margin-bottom: 8px;
-            flex-shrink: 0;
-        }
+        #developerDashboard { display: none; flex-direction: column; gap: 8px; padding: 10px 12px; background: rgba(59,130,246,0.02); border: 1px solid rgba(59,130,246,0.05); border-radius: 12px; margin-bottom: 6px; flex-shrink: 0; }
         #developerDashboard.active { display: flex; }
-        
-        .dev-dashboard-title { color: #3b82f6; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-        .dev-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0; }
-        .dev-tabs .btn { padding: 4px 14px; font-size: 0.6rem; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); }
-        .dev-tabs .btn.active { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .dev-tabs .btn:hover { background: rgba(255,255,255,0.06); }
-        
+        .dev-dashboard-title { color: #3b82f6; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .dev-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin: 4px 0; }
+        .dev-tabs .btn { padding: 3px 12px; font-size: 0.55rem; border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); }
+        .dev-tabs .btn.active { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.15); color: #60a5fa; }
+        .dev-tabs .btn:hover { background: rgba(255,255,255,0.05); }
         .dev-tab-content { display: none; padding: 4px 0; }
         .dev-tab-content.active { display: block; }
+        .dev-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)); gap: 6px; margin-bottom: 8px; }
+        .dev-stat { background: rgba(255,255,255,0.02); padding: 6px; border-radius: 8px; text-align: center; }
+        .dev-stat .value { font-size: 1rem; font-weight: 600; color: #a78bfa; }
+        .dev-stat .label { font-size: 0.45rem; color: rgba(255,255,255,0.1); margin-top: 1px; }
+        .dev-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+        .dev-actions .btn { flex: 1; min-width: 70px; padding: 6px 10px; font-size: 0.6rem; }
         
-        .dev-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 10px; }
-        .dev-stat { background: rgba(255, 255, 255, 0.02); padding: 8px; border-radius: 8px; text-align: center; }
-        .dev-stat .value { font-size: 1.1rem; font-weight: 600; color: #a78bfa; }
-        .dev-stat .label { font-size: 0.5rem; color: rgba(255, 255, 255, 0.12); margin-top: 1px; }
-        .dev-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .dev-actions .btn { flex: 1; min-width: 80px; padding: 8px 12px; font-size: 0.7rem; }
-        
-        /* ===== IP CONTROL ===== */
-        .ip-control-bar { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-        .ip-control-bar .input-field { flex: 1; min-width: 120px; padding: 8px 12px; font-size: 0.75rem; }
-        .ip-control-bar .btn { padding: 8px 14px; font-size: 0.65rem; }
-        
-        #ipListContainer {
-            max-height: 180px;
-            overflow-y: auto;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 8px;
-            padding: 6px;
-        }
+        .ip-control-bar { display: flex; gap: 6px; margin-bottom: 6px; flex-wrap: wrap; }
+        .ip-control-bar .input-field { flex: 1; min-width: 100px; padding: 6px 10px; font-size: 0.7rem; }
+        .ip-control-bar .btn { padding: 6px 12px; font-size: 0.6rem; }
+        #ipListContainer { max-height: 150px; overflow-y: auto; background: rgba(255,255,255,0.01); border-radius: 8px; padding: 4px; }
         #ipListContainer::-webkit-scrollbar { width: 3px; }
-        #ipListContainer::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.15); border-radius: 10px; }
-        
-        .ip-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 10px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 6px;
-            border-left: 2px solid rgba(139, 92, 246, 0.1);
-            margin-bottom: 3px;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-        .ip-item.banned { border-left-color: #ef4444; background: rgba(239, 68, 68, 0.04); }
-        .ip-item .ip-info { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .ip-item .ip-info .ip-addr { font-size: 0.7rem; color: #c0c0c0; }
-        .ip-item .ip-info .ip-badge { font-size: 0.45rem; padding: 1px 8px; border-radius: 10px; font-weight: 600; }
+        #ipListContainer::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.1); border-radius: 10px; }
+        .ip-item { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; background: rgba(255,255,255,0.01); border-radius: 6px; border-left: 2px solid rgba(139,92,246,0.08); margin-bottom: 2px; flex-wrap: wrap; gap: 4px; }
+        .ip-item.banned { border-left-color: #ef4444; background: rgba(239,68,68,0.04); }
+        .ip-item .ip-info { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+        .ip-item .ip-info .ip-addr { font-size: 0.65rem; color: #c0c0c0; }
+        .ip-item .ip-info .ip-badge { font-size: 0.4rem; padding: 1px 6px; border-radius: 10px; font-weight: 600; }
         .ip-item .ip-info .ip-badge.banned { background: #ef4444; color: white; }
-        .ip-item .ip-info .ip-badge.normal { background: rgba(139, 92, 246, 0.15); color: #a78bfa; }
-        .ip-item .ip-info .ip-detail { color: rgba(255, 255, 255, 0.08); font-size: 0.45rem; }
-        .ip-item .ip-actions { display: flex; gap: 3px; flex-wrap: wrap; }
-        .ip-item .ip-actions .btn { padding: 2px 10px; font-size: 0.5rem; border-radius: 6px; }
+        .ip-item .ip-info .ip-badge.normal { background: rgba(139,92,246,0.12); color: #a78bfa; }
+        .ip-item .ip-info .ip-detail { color: rgba(255,255,255,0.06); font-size: 0.4rem; }
+        .ip-item .ip-actions { display: flex; gap: 2px; flex-wrap: wrap; }
+        .ip-item .ip-actions .btn { padding: 1px 8px; font-size: 0.45rem; border-radius: 6px; }
         
-        .error {
-            color: #fb7185;
+        .waf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 10px; }
+        .waf-stat { background: rgba(255,255,255,0.02); padding: 8px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.03); }
+        .waf-stat .value { font-size: 1.2rem; font-weight: 700; }
+        .waf-stat .label { font-size: 0.45rem; color: rgba(255,255,255,0.1); margin-top: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        .waf-chart-container { background: rgba(255,255,255,0.02); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.03); }
+        .waf-chart-title { color: rgba(255,255,255,0.08); font-size: 0.5rem; letter-spacing: 2px; margin-bottom: 6px; }
+        #wafChart { height: 80px; display: flex; align-items: flex-end; gap: 2px; padding: 2px 0; overflow-x: auto; }
+        #wafChart .bar { flex: 1; min-width: 4px; border-radius: 2px 2px 0 0; transition: all 0.5s ease; }
+        .waf-updated { color: rgba(255,255,255,0.04); font-size: 0.4rem; text-align: right; margin-top: 4px; }
+        
+        .error { color: #fb7185; text-align: center; padding: 6px; border: 1px solid rgba(251,113,133,0.08); border-radius: 8px; display: none; font-size: 0.7rem; flex-shrink: 0; }
+        .security-result { color: rgba(255,255,255,0.15); font-size: 0.6rem; padding: 6px; background: rgba(255,255,255,0.01); border-radius: 8px; margin-top: 4px; display: none; line-height: 1.6; }
+        .security-result.success { color: #34d399; border: 1px solid rgba(52,211,153,0.08); }
+        .security-result.error { color: #fb7185; border: 1px solid rgba(251,113,133,0.08); }
+        
+        /* ================================================================
+           BAN OVERLAY (FULLSCREEN)
+           ================================================================ */
+        #banOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(10, 10, 20, 0.97);
+            backdrop-filter: blur(30px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: banFadeIn 0.6s ease-out;
+        }
+        #banOverlay.active { display: flex; }
+        @keyframes banFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .ban-overlay-content {
+            max-width: 520px;
+            width: 100%;
+            padding: 20px;
             text-align: center;
-            padding: 8px;
-            border: 1px solid rgba(251, 113, 133, 0.08);
-            border-radius: 8px;
-            display: none;
-            font-size: 0.75rem;
-            flex-shrink: 0;
         }
+        .ban-overlay-icon { font-size: 4.5rem; margin-bottom: 12px; animation: pulse-ban 2s ease-in-out infinite; }
+        @keyframes pulse-ban { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(239,68,68,0.2)); } 50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(239,68,68,0.4)); } }
+        .ban-overlay-title { font-size: 2rem; font-weight: 700; color: #fb7185; margin-bottom: 4px; letter-spacing: 2px; }
+        .ban-overlay-subtitle { color: rgba(255,255,255,0.15); font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; }
+        .ban-overlay-divider { border: none; border-top: 1px solid rgba(239,68,68,0.08); margin: 16px 0; }
+        .ban-overlay-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+        .ban-overlay-stat { background: rgba(255,255,255,0.02); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); }
+        .ban-overlay-stat .stat-value { font-size: 1.2rem; font-weight: 700; }
+        .ban-overlay-stat .stat-label { font-size: 0.5rem; color: rgba(255,255,255,0.12); text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; }
+        .ban-overlay-stat.danger .stat-value { color: #fb7185; }
+        .ban-overlay-stat.warning .stat-value { color: #fbbf24; }
+        .ban-overlay-stat.info .stat-value { color: #60a5fa; }
+        .ban-overlay-stat.success .stat-value { color: #34d399; }
         
-        .security-result {
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 0.65rem;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.01);
-            border-radius: 8px;
-            margin-top: 6px;
-            display: none;
-            line-height: 1.6;
-        }
-        .security-result.success { color: #34d399; border: 1px solid rgba(52, 211, 153, 0.1); }
-        .security-result.error { color: #fb7185; border: 1px solid rgba(251, 113, 133, 0.1); }
+        .ban-overlay-risk { margin: 12px 0; background: rgba(255,255,255,0.02); border-radius: 12px; padding: 14px; border: 1px solid rgba(255,255,255,0.03); }
+        .ban-overlay-risk .risk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .ban-overlay-risk .risk-label { font-size: 0.7rem; color: rgba(255,255,255,0.15); letter-spacing: 2px; }
+        .ban-overlay-risk .risk-value { font-size: 1rem; font-weight: 700; }
+        .ban-overlay-risk .risk-bar-track { width: 100%; height: 5px; background: rgba(255,255,255,0.04); border-radius: 10px; overflow: hidden; }
+        .ban-overlay-risk .risk-bar-fill { height: 100%; border-radius: 10px; transition: width 1.5s ease; background: linear-gradient(90deg, #34d399, #fbbf24, #fb7185, #ef4444); width: 0%; }
+        
+        .ban-overlay-reason { background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.06); border-radius: 12px; padding: 14px; margin: 10px 0; text-align: left; }
+        .ban-overlay-reason .reason-title { color: rgba(255,255,255,0.15); font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; }
+        .ban-overlay-reason .reason-text { color: #e0e0e0; font-size: 0.8rem; margin-top: 4px; line-height: 1.5; }
+        .ban-overlay-possibilities { margin: 6px 0 2px 16px; color: rgba(255,255,255,0.15); font-size: 0.65rem; line-height: 1.8; }
+        .ban-overlay-possibilities li { list-style: disc; }
+        
+        .ban-overlay-btn { padding: 12px 24px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.12); border-radius: 12px; color: #fb7185; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all 0.3s ease; font-family: inherit; width: 100%; margin-top: 12px; }
+        .ban-overlay-btn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.2); transform: translateY(-2px); }
+        .ban-overlay-btn-secondary { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.04); color: rgba(255,255,255,0.15); }
+        .ban-overlay-btn-secondary:hover { background: rgba(255,255,255,0.06); }
+        .ban-overlay-footer { color: rgba(255,255,255,0.02); font-size: 0.45rem; letter-spacing: 2px; margin-top: 12px; }
         
         @media (max-width: 600px) {
-            .container { padding: 8px; }
-            .chat-card { padding: 16px; height: 96vh; max-height: none; border-radius: 16px; }
-            .chat-title { font-size: 1.3rem; }
-            .chat-header { flex-direction: column; align-items: stretch; gap: 6px; }
+            .container { padding: 6px; }
+            .chat-card { padding: 14px; height: 98vh; max-height: none; border-radius: 16px; }
+            .chat-title { font-size: 1.2rem; }
+            .chat-header { flex-direction: column; align-items: stretch; gap: 4px; }
             .chat-status { justify-content: space-between; }
             .chat-input-area { flex-direction: column; }
             .chat-input-area .btn { width: 100%; }
-            .captcha-box .question { font-size: 1.4rem; }
-            #messages { height: 280px; }
+            .captcha-box .question { font-size: 1.3rem; }
+            #messages { height: 200px; }
             .dev-actions .btn { min-width: 100%; }
             .ip-control-bar { flex-direction: column; }
             .ip-item { flex-direction: column; align-items: stretch; gap: 4px; }
             .ip-item .ip-actions { justify-content: flex-end; }
+            .ban-overlay-stats { grid-template-columns: 1fr 1fr; }
+            .ban-overlay-title { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -404,7 +251,7 @@
         
         <div id="errorMsg" class="error"></div>
         
-        <!-- ===== GATEWAY ===== -->
+        <!-- GATEWAY -->
         <div id="gatewaySection">
             <div class="gateway-icon">🔐</div>
             <div class="gateway-title">Security Gateway</div>
@@ -412,28 +259,25 @@
             <div class="gateway-status" id="gatewayStatus">⏳ Memeriksa session...</div>
         </div>
         
-        <!-- ===== VERIFIKASI ===== -->
+        <!-- VERIFIKASI -->
         <div id="verifySection">
             <div class="input-group">
                 <label>👤 Username Telegram</label>
                 <input type="text" id="telegramUsername" class="input-field" placeholder="Masukkan username..." required>
             </div>
-            
             <div class="input-group">
                 <label>🔐 Verifikasi Captcha</label>
                 <div class="captcha-box">
                     <div class="question" id="captchaQuestion">Loading...</div>
                     <div class="hint">✦ Verifikasi manusia ✦</div>
                 </div>
-                <input type="text" id="captchaAnswer" class="input-field" placeholder="Masukkan hasil penjumlahan..." required style="margin-top:8px;">
+                <input type="text" id="captchaAnswer" class="input-field" placeholder="Masukkan hasil penjumlahan..." required style="margin-top:6px;">
                 <input type="hidden" id="captchaId">
-                <button class="btn" onclick="verifyCaptcha()" style="margin-top:10px;" id="verifyBtn">🚀 Verifikasi</button>
+                <button class="btn" onclick="verifyCaptcha()" style="margin-top:8px;" id="verifyBtn">🚀 Verifikasi</button>
             </div>
-            
             <div class="developer-toggle">
                 <button onclick="toggleDeveloperLogin()">🔑 Login Developer</button>
             </div>
-            
             <div id="developerLoginSection">
                 <div class="input-group">
                     <label>👤 Username Developer</label>
@@ -447,7 +291,7 @@
             </div>
         </div>
         
-        <!-- ===== CHAT ===== -->
+        <!-- CHAT -->
         <div id="chatSection">
             <div class="chat-header">
                 <div>
@@ -463,37 +307,37 @@
                 </div>
             </div>
             
-            <!-- ===== DEVELOPER DASHBOARD ===== -->
+            <!-- DEVELOPER DASHBOARD -->
             <div id="developerDashboard">
                 <div class="dev-dashboard-title">📊 Developer Dashboard</div>
                 <div class="dev-tabs">
                     <button class="btn active" onclick="showDevTab('stats')" data-tab="stats">📊 Stats</button>
+                    <button class="btn" onclick="showDevTab('waf')" data-tab="waf">🛡️ WAF</button>
                     <button class="btn" onclick="showDevTab('ipcontrol')" data-tab="ipcontrol">🌐 Control IP</button>
-                    <button class="btn" onclick="showDevTab('security')" data-tab="security">🛡️ Security</button>
+                    <button class="btn" onclick="showDevTab('security')" data-tab="security">🔒 Security</button>
                 </div>
-                
-                <!-- Tab: Stats -->
                 <div id="devTabStats" class="dev-tab-content active">
                     <div class="dev-stats">
-                        <div class="dev-stat">
-                            <div class="value" id="statUsers">0</div>
-                            <div class="label">Online Users</div>
-                        </div>
-                        <div class="dev-stat">
-                            <div class="value" id="statMessages">0</div>
-                            <div class="label">Total Messages</div>
-                        </div>
-                        <div class="dev-stat">
-                            <div class="value" id="statBlocked">0</div>
-                            <div class="label">Blocked IPs</div>
-                        </div>
+                        <div class="dev-stat"><div class="value" id="statUsers">0</div><div class="label">Online Users</div></div>
+                        <div class="dev-stat"><div class="value" id="statMessages">0</div><div class="label">Total Messages</div></div>
+                        <div class="dev-stat"><div class="value" id="statBlocked">0</div><div class="label">Blocked IPs</div></div>
                     </div>
                     <div class="dev-actions">
                         <button class="btn btn-clear btn-sm" onclick="clearMessages()">🗑️ Clear Messages</button>
                     </div>
                 </div>
-                
-                <!-- Tab: Control IP -->
+                <div id="devTabWaf" class="dev-tab-content">
+                    <div class="waf-grid">
+                        <div class="waf-stat"><div class="value" id="wafTotalRequests" style="color:#60a5fa;">0</div><div class="label">Total Requests</div></div>
+                        <div class="waf-stat"><div class="value" id="wafUniqueIPs" style="color:#34d399;">0</div><div class="label">Unique IPs</div></div>
+                        <div class="waf-stat"><div class="value" id="wafBannedIPs" style="color:#fb7185;">0</div><div class="label">Banned IPs</div></div>
+                    </div>
+                    <div class="waf-chart-container">
+                        <div class="waf-chart-title">📈 TRAFFIC HISTORY (50 DATA)</div>
+                        <div id="wafChart"><div style="color:rgba(255,255,255,0.05);font-size:0.5rem;padding:20px 0;text-align:center;width:100%;">Loading chart...</div></div>
+                    </div>
+                    <div class="waf-updated" id="wafLastUpdated">Last updated: -</div>
+                </div>
                 <div id="devTabIpcontrol" class="dev-tab-content">
                     <div class="ip-control-bar">
                         <input type="text" id="banIpInput" class="input-field" placeholder="IP address...">
@@ -501,12 +345,8 @@
                         <button class="btn btn-success btn-sm" onclick="unbanIp()">✅ Unban</button>
                         <button class="btn btn-secondary btn-sm" onclick="loadIpList()">🔄 Refresh</button>
                     </div>
-                    <div id="ipListContainer">
-                        <div style="color:rgba(255,255,255,0.05);text-align:center;padding:12px;font-size:0.7rem;">Loading IP list...</div>
-                    </div>
+                    <div id="ipListContainer"><div style="color:rgba(255,255,255,0.05);text-align:center;padding:10px;font-size:0.6rem;">Loading IP list...</div></div>
                 </div>
-                
-                <!-- Tab: Security -->
                 <div id="devTabSecurity" class="dev-tab-content">
                     <div class="dev-actions">
                         <button class="btn btn-secondary btn-sm" onclick="testSecurity()">🛡️ Test Security Gateway</button>
@@ -515,12 +355,8 @@
                 </div>
             </div>
             
-            <div id="messages">
-                <div class="empty-chat"><div class="icon">💬</div>BELUM ADA PESAN</div>
-            </div>
-            
+            <div id="messages"><div class="empty-chat"><div class="icon">💬</div>BELUM ADA PESAN</div></div>
             <div class="typing-indicator" id="typingIndicator">✎ ...</div>
-            
             <div class="chat-input-area">
                 <input type="text" id="chatInput" class="input-field" placeholder="Ketik pesan..." maxlength="500">
                 <button class="btn" onclick="sendMessage()">➤ Kirim</button>
@@ -530,9 +366,65 @@
     </div>
 </div>
 
+<!-- ================================================================
+     BAN OVERLAY (FULLSCREEN)
+     ================================================================ -->
+<div id="banOverlay">
+    <div class="ban-overlay-content">
+        <div class="ban-overlay-icon">⛔</div>
+        <div class="ban-overlay-title">AKSES DIBLOKIR</div>
+        <div class="ban-overlay-subtitle">✦ IP ANDA TELAH DIBAN ✦</div>
+        <hr class="ban-overlay-divider">
+        
+        <div class="ban-overlay-stats">
+            <div class="ban-overlay-stat danger">
+                <div class="stat-value" id="banStatus">BANNED</div>
+                <div class="stat-label">Status</div>
+            </div>
+            <div class="ban-overlay-stat warning">
+                <div class="stat-value" id="banRisk">0%</div>
+                <div class="stat-label">Risk Level</div>
+            </div>
+            <div class="ban-overlay-stat info">
+                <div class="stat-value" id="banAttempts">0</div>
+                <div class="stat-label">Failed Attempts</div>
+            </div>
+            <div class="ban-overlay-stat success">
+                <div class="stat-value" id="banDate">-</div>
+                <div class="stat-label">Banned Since</div>
+            </div>
+        </div>
+        
+        <div class="ban-overlay-risk">
+            <div class="risk-header">
+                <span class="risk-label">⚡ Threat Level</span>
+                <span class="risk-value" id="banRiskText" style="color:#34d399;">LOW</span>
+            </div>
+            <div class="risk-bar-track">
+                <div class="risk-bar-fill" id="banRiskBar"></div>
+            </div>
+        </div>
+        
+        <div class="ban-overlay-reason">
+            <div class="reason-title">📋 Alasan Pemblokiran</div>
+            <div class="reason-text" id="banReason">Aktivitas mencurigakan terdeteksi.</div>
+            <ul class="ban-overlay-possibilities" id="banPossibilities">
+                <li>Terlalu banyak percobaan login gagal (auto-ban)</li>
+                <li>Aktivitas yang tidak wajar</li>
+                <li>Diblokir oleh administrator</li>
+            </ul>
+        </div>
+        
+        <button class="ban-overlay-btn" onclick="location.reload()">🔄 Coba Lagi</button>
+        <button class="ban-overlay-btn ban-overlay-btn-secondary" onclick="window.location.href='mailto:support@example.com'">📧 Hubungi Admin</button>
+        
+        <div class="ban-overlay-footer">✦ CYBER CHAT SECURITY SYSTEM ✦</div>
+    </div>
+</div>
+
 <script>
     // ============================================================
-    // 1. ANTI-DEVTOOLS
+    // ANTI-DEVTOOLS
     // ============================================================
     document.addEventListener('keydown', (e) => {
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || (e.ctrlKey && e.key === 'U')) {
@@ -544,27 +436,87 @@
     document.addEventListener('contextmenu', (e) => { e.preventDefault(); showError('⛔ Right-click diblokir.'); return false; });
     
     // ============================================================
-    // 2. GLOBAL VARIABLES
+    // GLOBAL
     // ============================================================
-    let refreshInterval = null;
-    let typingInterval = null;
+    let refreshInterval = null, typingInterval = null, wafInterval = null;
     let lastMessageCount = 0;
-    let isDeveloper = false;
-    let username = '';
-    let isVerifying = false;
+    let isDeveloper = false, username = '', isVerifying = false;
     
     // ============================================================
-    // 3. AUTO CHECK SESSION
+    // BAN OVERLAY
+    // ============================================================
+    function showBanOverlay(banData) {
+        const overlay = document.getElementById('banOverlay');
+        
+        // Set data
+        document.getElementById('banStatus').textContent = banData.status || 'BANNED';
+        document.getElementById('banRisk').textContent = (banData.risk || 0) + '%';
+        document.getElementById('banAttempts').textContent = banData.attempts || 0;
+        document.getElementById('banDate').textContent = banData.bannedAt ? new Date(banData.bannedAt).toLocaleString() : '-';
+        document.getElementById('banReason').textContent = banData.reason || 'Aktivitas mencurigakan terdeteksi.';
+        
+        // Risk
+        const risk = banData.risk || 35;
+        const riskBar = document.getElementById('banRiskBar');
+        const riskText = document.getElementById('banRiskText');
+        riskBar.style.width = risk + '%';
+        if (risk < 30) { riskText.textContent = 'LOW'; riskText.style.color = '#34d399'; }
+        else if (risk < 60) { riskText.textContent = 'MEDIUM'; riskText.style.color = '#fbbf24'; }
+        else if (risk < 85) { riskText.textContent = 'HIGH'; riskText.style.color = '#fb7185'; }
+        else { riskText.textContent = 'CRITICAL'; riskText.style.color = '#ef4444'; }
+        
+        // Possibilities
+        const poss = document.getElementById('banPossibilities');
+        let items = [];
+        if ((banData.attempts || 0) >= 5) items.push('Terlalu banyak percobaan login gagal (auto-ban)');
+        if ((banData.attempts || 0) >= 3 && (banData.attempts || 0) < 5) items.push('Beberapa percobaan login gagal terdeteksi');
+        if (risk > 70) items.push('Aktivitas yang sangat mencurigakan (potensi serangan)');
+        if (banData.reason && banData.reason.toLowerCase().includes('admin')) items.push('Diblokir langsung oleh administrator sistem');
+        if (banData.reason && banData.reason.toLowerCase().includes('waf')) items.push('Diblokir oleh Web Application Firewall (WAF)');
+        if (items.length === 0) { items.push('Aktivitas mencurigakan terdeteksi dari IP Anda'); items.push('Diblokir oleh sistem keamanan otomatis'); }
+        poss.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+        
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function hideBanOverlay() {
+        document.getElementById('banOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // ============================================================
+    // CHECK BAN STATUS
+    // ============================================================
+    async function checkBanStatus() {
+        try {
+            const res = await fetch('/api/ban-status', { credentials: 'include' });
+            const data = await res.json();
+            if (data.isBanned) {
+                showBanOverlay(data);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Check ban error:', error);
+            return false;
+        }
+    }
+    
+    // ============================================================
+    // AUTO CHECK SESSION + BAN
     // ============================================================
     async function autoCheckSession() {
+        // Cek ban dulu
+        const banned = await checkBanStatus();
+        if (banned) return;
+        
         const statusEl = document.getElementById('gatewayStatus');
         statusEl.textContent = '⏳ Memeriksa session...';
         statusEl.className = 'gateway-status';
-        
         try {
             const res = await fetch('/api/check-session', { method: 'GET', credentials: 'include' });
             const data = await res.json();
-            
             if (data.valid) {
                 isDeveloper = data.isDeveloper || false;
                 username = data.username;
@@ -594,23 +546,20 @@
         document.getElementById('verifySection').style.display = 'none';
         document.getElementById('chatSection').style.display = 'flex';
         document.getElementById('currentUser').textContent = username;
-        
         if (isDeveloper) {
             document.getElementById('devBadge').style.display = 'inline-block';
             document.getElementById('devDashBtn').style.display = 'inline-block';
             document.getElementById('developerDashboard').classList.add('active');
             loadDeveloperStats();
         }
-        
         loadMessages();
         startAutoRefresh();
         startTypingPolling();
         updateOnlineUsers();
+        if (isDeveloper) startWafPolling();
     }
     
-    // ============================================================
-    // 4. CAPTCHA
-    // ============================================================
+    // ===== CAPTCHA =====
     async function loadCaptcha() {
         try {
             const res = await fetch('/api/captcha');
@@ -628,29 +577,33 @@
     async function verifyCaptcha() {
         if (isVerifying) return;
         isVerifying = true;
-        
         const username = document.getElementById('telegramUsername').value.trim();
         const answer = document.getElementById('captchaAnswer').value.trim();
         const captchaId = document.getElementById('captchaId').value;
-        
-        if (!username || !answer) {
-            showError('Username dan captcha wajib diisi!');
-            isVerifying = false;
-            return;
-        }
-        
+        if (!username || !answer) { showError('Username dan captcha wajib diisi!'); isVerifying = false; return; }
         const btn = document.getElementById('verifyBtn');
-        btn.disabled = true;
-        btn.textContent = '⏳ Verifying...';
-        
+        btn.disabled = true; btn.textContent = '⏳ Verifying...';
         try {
             const res = await fetch('/api/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ telegramUsername: username, answer, captchaId })
             });
-            
             const data = await res.json();
+            
+            // Cek kalo response ban
+            if (data.error === 'BANNED' || data.error === 'AUTO_BANNED') {
+                if (data.banData) {
+                    showBanOverlay(data.banData);
+                } else {
+                    // Cek ulang status ban
+                    await checkBanStatus();
+                }
+                isVerifying = false;
+                btn.disabled = false;
+                btn.textContent = '🚀 Verifikasi';
+                return;
+            }
             
             if (data.success) {
                 isDeveloper = data.isDeveloper || false;
@@ -659,68 +612,43 @@
                 showError(data.error || 'Verifikasi gagal!');
                 loadCaptcha();
             }
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
-        
-        btn.disabled = false;
-        btn.textContent = '🚀 Verifikasi';
+        } catch (error) { showError('Error: ' + error.message); }
+        btn.disabled = false; btn.textContent = '🚀 Verifikasi';
         isVerifying = false;
     }
     
-    // ============================================================
-    // 5. DEVELOPER LOGIN
-    // ============================================================
+    // ===== DEVELOPER LOGIN =====
     function toggleDeveloperLogin() {
         const section = document.getElementById('developerLoginSection');
         section.classList.toggle('active');
-        if (section.classList.contains('active')) {
-            document.getElementById('developerUsername').focus();
-        }
+        if (section.classList.contains('active')) document.getElementById('developerUsername').focus();
     }
     
     async function developerLogin() {
         const username = document.getElementById('developerUsername').value.trim();
         const password = document.getElementById('developerPassword').value.trim();
-        
-        if (!username || !password) {
-            showError('Username dan password wajib diisi!');
-            return;
-        }
-        
+        if (!username || !password) { showError('Username dan password wajib diisi!'); return; }
         try {
             const res = await fetch('/api/developer-login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            
             const data = await res.json();
-            
             if (data.success) {
                 isDeveloper = true;
                 showError('✅ Login developer berhasil!');
                 setTimeout(() => location.reload(), 1000);
-            } else {
-                showError(data.error || 'Login gagal!');
-            }
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
+            } else { showError(data.error || 'Login gagal!'); }
+        } catch (error) { showError('Error: ' + error.message); }
     }
     
-    // ============================================================
-    // 6. MESSAGES
-    // ============================================================
+    // ===== MESSAGES =====
     async function sendMessage() {
         const input = document.getElementById('chatInput');
         const message = input.value.trim();
         if (!message) return;
-        if (message.length > 500) {
-            showError('Pesan maksimal 500 karakter!');
-            return;
-        }
-        
+        if (message.length > 500) { showError('Pesan maksimal 500 karakter!'); return; }
         try {
             const res = await fetch('/api/chat/send', {
                 method: 'POST',
@@ -728,111 +656,86 @@
                 body: JSON.stringify({ message })
             });
             
-            if (!res.ok) {
+            // Cek kalo response ban
+            if (res.status === 403) {
                 const data = await res.json();
-                if (res.status === 401) {
-                    showError('Session expired. Login ulang.');
-                    logout();
-                    return;
+                if (data.banData) {
+                    showBanOverlay(data.banData);
+                } else {
+                    await checkBanStatus();
                 }
-                throw new Error(data.error || 'Gagal kirim pesan');
+                return;
             }
             
+            if (!res.ok) {
+                const data = await res.json();
+                if (res.status === 401) { showError('Session expired. Login ulang.'); logout(); return; }
+                throw new Error(data.error || 'Gagal kirim pesan');
+            }
             input.value = '';
             document.getElementById('typingIndicator').classList.remove('active');
             loadMessages();
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
+        } catch (error) { showError('Error: ' + error.message); }
     }
     
     async function loadMessages() {
         try {
             const res = await fetch('/api/chat/messages');
-            if (!res.ok) {
-                if (res.status === 401) { logout(); return; }
-                throw new Error('Gagal ambil pesan');
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                return;
             }
-            
+            if (!res.ok) { if (res.status === 401) { logout(); return; } throw new Error('Gagal ambil pesan'); }
             const data = await res.json();
             lastMessageCount = data.messages.length;
             renderMessages(data.messages);
-            
-            if (isDeveloper) {
-                document.getElementById('statMessages').textContent = data.messages.length;
-            }
-        } catch (error) {
-            console.error('Load messages error:', error);
-        }
+            if (isDeveloper) document.getElementById('statMessages').textContent = data.messages.length;
+        } catch (error) { console.error('Load messages error:', error); }
     }
     
     function renderMessages(messages) {
         const container = document.getElementById('messages');
-        
         if (!messages || messages.length === 0) {
             container.innerHTML = `<div class="empty-chat"><div class="icon">💬</div>BELUM ADA PESAN</div>`;
             return;
         }
-        
         let html = '';
         messages.forEach(msg => {
             const time = new Date(msg.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
             const isDev = msg.isDeveloper || false;
-            html += `
-                <div class="message${isDev ? ' developer' : ''}">
-                    <div class="msg-user">
-                        ${msg.username}
-                        ${isDev ? '<span class="dev-badge">⭐ DEV</span>' : ''}
-                    </div>
-                    <div class="msg-text">${msg.message}</div>
-                    <div class="msg-time">${time}</div>
-                </div>
-            `;
+            html += `<div class="message${isDev ? ' developer' : ''}">
+                <div class="msg-user">${msg.username}${isDev ? ' <span class="dev-badge">⭐ DEV</span>' : ''}</div>
+                <div class="msg-text">${msg.message}</div>
+                <div class="msg-time">${time}</div>
+            </div>`;
         });
-        
         container.innerHTML = html;
         container.scrollTop = container.scrollHeight;
     }
     
-    // ============================================================
-    // 7. CLEAR MESSAGES (Developer Only)
-    // ============================================================
+    // ===== CLEAR MESSAGES =====
     async function clearMessages() {
-        if (!confirm('⚠️ Yakin mau hapus semua pesan? Tindakan ini tidak bisa dibatalkan!')) return;
-        
+        if (!confirm('⚠️ Yakin mau hapus semua pesan?')) return;
         try {
-            const res = await fetch('/api/chat/clear', {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            
-            const data = await res.json();
-            if (data.success) {
-                showError('✅ Semua pesan berhasil dihapus!');
-                loadMessages();
-            } else {
-                showError(data.error || 'Gagal hapus pesan');
+            const res = await fetch('/api/chat/clear', { method: 'DELETE', credentials: 'include' });
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                return;
             }
-        } catch (error) {
-            showError('Error: ' + error.message);
-        }
+            const data = await res.json();
+            if (data.success) { showError('✅ Semua pesan berhasil dihapus!'); loadMessages(); }
+            else { showError(data.error || 'Gagal hapus pesan'); }
+        } catch (error) { showError('Error: ' + error.message); }
     }
     
-    // ============================================================
-    // 8. TYPING INDICATOR
-    // ============================================================
+    // ===== TYPING =====
     document.getElementById('chatInput').addEventListener('input', function() {
         const indicator = document.getElementById('typingIndicator');
         const isTyping = this.value.length > 0;
-        
-        if (isTyping) {
-            indicator.classList.add('active');
-            indicator.textContent = '✎ typing...';
-        } else {
-            indicator.classList.remove('active');
-            indicator.textContent = '✎ ...';
-        }
-        
+        if (isTyping) { indicator.classList.add('active'); indicator.textContent = '✎ typing...'; }
+        else { indicator.classList.remove('active'); indicator.textContent = '✎ ...'; }
         fetch('/api/typing', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -846,6 +749,11 @@
         typingInterval = setInterval(async () => {
             try {
                 const res = await fetch('/api/typing-users', { credentials: 'include' });
+                if (res.status === 403) {
+                    const data = await res.json();
+                    if (data.banData) showBanOverlay(data.banData);
+                    return;
+                }
                 const data = await res.json();
                 if (data.success && data.typingUsers.length > 0) {
                     const typingUsers = data.typingUsers.filter(u => u !== username);
@@ -861,12 +769,15 @@
         }, 3000);
     }
     
-    // ============================================================
-    // 9. ONLINE USERS
-    // ============================================================
+    // ===== ONLINE USERS =====
     async function updateOnlineUsers() {
         try {
             const res = await fetch('/api/online-users', { credentials: 'include' });
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                return;
+            }
             const data = await res.json();
             if (data.success) {
                 const count = data.users.length;
@@ -876,82 +787,124 @@
         } catch {}
     }
     
-    // ============================================================
-    // 10. DEVELOPER DASHBOARD
-    // ============================================================
+    // ===== DEVELOPER DASHBOARD =====
     function toggleDeveloperDashboard() {
         const dashboard = document.getElementById('developerDashboard');
         dashboard.classList.toggle('active');
         if (dashboard.classList.contains('active')) {
             loadDeveloperStats();
+            if (document.getElementById('devTabWaf').classList.contains('active')) loadWafStats();
         }
     }
     
     function showDevTab(tab) {
         document.querySelectorAll('.dev-tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.dev-tabs .btn').forEach(el => el.classList.remove('active'));
-        
-        const tabMap = {
-            'stats': 'devTabStats',
-            'ipcontrol': 'devTabIpcontrol',
-            'security': 'devTabSecurity'
-        };
-        
+        const tabMap = { 'stats': 'devTabStats', 'waf': 'devTabWaf', 'ipcontrol': 'devTabIpcontrol', 'security': 'devTabSecurity' };
         const target = document.getElementById(tabMap[tab]);
         if (target) target.classList.add('active');
-        
         const btn = document.querySelector(`.dev-tabs .btn[data-tab="${tab}"]`);
         if (btn) btn.classList.add('active');
-        
         if (tab === 'ipcontrol') loadIpList();
         if (tab === 'stats') loadDeveloperStats();
+        if (tab === 'waf') loadWafStats();
     }
     
     async function loadDeveloperStats() {
         try {
             const res = await fetch('/api/test-security', { credentials: 'include' });
-            const data = await res.json();
-            if (data.success) {
-                document.getElementById('statBlocked').textContent = data.totalBanned || 0;
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                return;
             }
+            const data = await res.json();
+            if (data.success) document.getElementById('statBlocked').textContent = data.totalBanned || 0;
         } catch {}
     }
     
-    // ============================================================
-    // 11. IP CONTROL
-    // ============================================================
+    // ===== WAF STATS =====
+    async function loadWafStats() {
+        try {
+            const res = await fetch('/api/waf-stats', { credentials: 'include' });
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                return;
+            }
+            const data = await res.json();
+            if (data.success) {
+                const stats = data.stats;
+                document.getElementById('wafTotalRequests').textContent = stats.totalRequests || 0;
+                document.getElementById('wafUniqueIPs').textContent = stats.uniqueIPs || 0;
+                document.getElementById('wafBannedIPs').textContent = stats.bannedIPs || 0;
+                document.getElementById('wafLastUpdated').textContent = `Last updated: ${new Date(stats.lastUpdated).toLocaleString()}`;
+                renderWafChart(stats.history || []);
+            }
+        } catch (error) { console.error('WAF stats error:', error); }
+    }
+    
+    function renderWafChart(history) {
+        const container = document.getElementById('wafChart');
+        if (!history || history.length === 0) {
+            container.innerHTML = '<div style="color:rgba(255,255,255,0.05);font-size:0.5rem;padding:20px 0;text-align:center;width:100%;">Belum ada data</div>';
+            return;
+        }
+        const max = Math.max(1, ...history.map(h => h.totalRequests || 0));
+        let html = '';
+        history.forEach((item, index) => {
+            const height = max > 0 ? Math.max(4, (item.totalRequests || 0) / max * 100) : 4;
+            const isBanned = (item.bannedIPs || 0) > 0;
+            const color = isBanned ? '#fb7185' : '#60a5fa';
+            html += `<div class="bar" style="height:${height}%;background:${color};opacity:${0.4 + (index / history.length) * 0.6};" title="${new Date(item.timestamp).toLocaleString()}: ${item.totalRequests} requests"></div>`;
+        });
+        container.innerHTML = html;
+    }
+    
+    function startWafPolling() {
+        if (wafInterval) clearInterval(wafInterval);
+        wafInterval = setInterval(() => {
+            if (document.getElementById('devTabWaf').classList.contains('active')) {
+                loadWafStats();
+            }
+        }, 5000);
+    }
+    
+    // ===== IP CONTROL =====
     async function loadIpList() {
         const container = document.getElementById('ipListContainer');
-        container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:12px;font-size:0.7rem;">⏳ Loading IP list...</div>';
-        
+        container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:10px;font-size:0.6rem;">⏳ Loading IP list...</div>';
         try {
             const res = await fetch('/api/ip-list', { credentials: 'include' });
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                container.innerHTML = '<div style="color:#fb7185;text-align:center;padding:10px;font-size:0.6rem;">⛔ Akses ditolak</div>';
+                return;
+            }
             const data = await res.json();
-            
             if (data.success && data.ips && data.ips.length > 0) {
                 let html = '';
                 data.ips.forEach(item => {
                     const isBanned = item.isBanned;
-                    html += `
-                        <div class="ip-item${isBanned ? ' banned' : ''}">
-                            <div class="ip-info">
-                                <span class="ip-addr">${item.ip}</span>
-                                <span class="ip-badge ${isBanned ? 'banned' : 'normal'}">${isBanned ? 'BANNED' : 'Active'}</span>
-                                <span class="ip-detail">${item.attempts || 0} attempts • ${new Date(item.lastSeen).toLocaleDateString()}</span>
-                            </div>
-                            <div class="ip-actions">
-                                ${!isBanned ? `<button class="btn btn-danger btn-sm" onclick="banIpManual('${item.ip}')">Ban</button>` : `<button class="btn btn-success btn-sm" onclick="unbanIpManual('${item.ip}')">Unban</button>`}
-                                <button class="btn btn-secondary btn-sm" onclick="deleteIpHistory('${item.ip}')" ${isBanned ? 'disabled style="opacity:0.3;"' : ''}>🗑️</button>
-                            </div>
+                    html += `<div class="ip-item${isBanned ? ' banned' : ''}">
+                        <div class="ip-info">
+                            <span class="ip-addr">${item.ip}</span>
+                            <span class="ip-badge ${isBanned ? 'banned' : 'normal'}">${isBanned ? 'BANNED' : 'Active'}</span>
+                            <span class="ip-detail">${item.attempts || 0} attempts • ${item.totalVisits || 0} visits</span>
                         </div>
-                    `;
+                        <div class="ip-actions">
+                            ${!isBanned ? `<button class="btn btn-danger btn-sm" onclick="banIpManual('${item.ip}')">Ban</button>` : `<button class="btn btn-success btn-sm" onclick="unbanIpManual('${item.ip}')">Unban</button>`}
+                            <button class="btn btn-secondary btn-sm" onclick="deleteIpHistory('${item.ip}')" ${isBanned ? 'disabled style="opacity:0.3;"' : ''}>🗑️</button>
+                        </div>
+                    </div>`;
                 });
                 container.innerHTML = html;
             } else {
-                container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:12px;font-size:0.7rem;">Belum ada IP yang tercatat.</div>';
+                container.innerHTML = '<div style="color:rgba(255,255,255,0.05);text-align:center;padding:10px;font-size:0.6rem;">Belum ada IP yang tercatat.</div>';
             }
         } catch (error) {
-            container.innerHTML = `<div style="color:#fb7185;text-align:center;padding:12px;font-size:0.7rem;">❌ Error: ${error.message}</div>`;
+            container.innerHTML = `<div style="color:#fb7185;text-align:center;padding:10px;font-size:0.6rem;">❌ Error: ${error.message}</div>`;
         }
     }
     
@@ -971,11 +924,17 @@
                 body: JSON.stringify({ ip, reason: 'Diblokir oleh admin' }),
                 credentials: 'include'
             });
+            
             const data = await res.json();
+            
             if (data.success) {
                 showError(`✅ ${data.message}`);
-                loadIpList();
-                loadDeveloperStats();
+                if (data.selfBan && data.banData) {
+                    showBanOverlay(data.banData);
+                } else {
+                    loadIpList();
+                    loadDeveloperStats();
+                }
             } else {
                 showError(data.error || 'Gagal ban IP');
             }
@@ -1039,24 +998,24 @@
         }
     }
     
-    // ============================================================
-    // 12. SECURITY TEST
-    // ============================================================
+    // ===== SECURITY TEST =====
     async function testSecurity() {
         const result = document.getElementById('securityTestResult');
         result.style.display = 'block';
         result.className = 'security-result';
         result.textContent = '⏳ Menguji keamanan...';
-        
         try {
             const res = await fetch('/api/test-security', { credentials: 'include' });
+            if (res.status === 403) {
+                const data = await res.json();
+                if (data.banData) showBanOverlay(data.banData);
+                result.textContent = '⛔ Akses ditolak';
+                result.className = 'security-result error';
+                return;
+            }
             const data = await res.json();
             if (data.success) {
-                result.innerHTML = `
-                    ✅ Security Gateway berfungsi normal!<br>
-                    Session: ${data.session.username} (${data.session.isDeveloper ? 'Developer' : 'User'})<br>
-                    Total IPs: ${data.totalIPs || 0} • Banned: ${data.totalBanned || 0}
-                `;
+                result.innerHTML = `✅ Security Gateway berfungsi normal!<br>Session: ${data.session.username} (${data.session.isDeveloper ? 'Developer' : 'User'})<br>Total IPs: ${data.totalIPs || 0} • Banned: ${data.totalBanned || 0}`;
                 result.className = 'security-result success';
             } else {
                 result.textContent = '❌ Error: ' + (data.error || 'Gagal test security');
@@ -1066,35 +1025,23 @@
             result.textContent = '❌ Error: ' + error.message;
             result.className = 'security-result error';
         }
-        
-        setTimeout(() => {
-            result.style.display = 'none';
-        }, 6000);
+        setTimeout(() => { result.style.display = 'none'; }, 6000);
     }
     
-    // ============================================================
-    // 13. LOGOUT
-    // ============================================================
+    // ===== LOGOUT =====
     async function logout() {
         await fetch('/api/logout', { method: 'POST' });
         document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         location.reload();
     }
     
-    // ============================================================
-    // 14. AUTO REFRESH
-    // ============================================================
+    // ===== AUTO REFRESH =====
     function startAutoRefresh() {
         if (refreshInterval) clearInterval(refreshInterval);
-        refreshInterval = setInterval(() => {
-            loadMessages();
-            updateOnlineUsers();
-        }, 3000);
+        refreshInterval = setInterval(() => { loadMessages(); updateOnlineUsers(); }, 3000);
     }
     
-    // ============================================================
-    // 15. ERROR HANDLING
-    // ============================================================
+    // ===== ERROR =====
     function showError(msg) {
         const el = document.getElementById('errorMsg');
         el.textContent = msg;
@@ -1103,25 +1050,16 @@
     }
     function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
     
-    // ============================================================
-    // 16. ENTER KEY
-    // ============================================================
+    // ===== ENTER =====
     document.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            if (document.getElementById('chatSection').style.display === 'flex') {
-                sendMessage();
-            } else if (document.getElementById('verifySection').style.display === 'flex') {
-                verifyCaptcha();
-            }
+            if (document.getElementById('chatSection').style.display === 'flex') sendMessage();
+            else if (document.getElementById('verifySection').style.display === 'flex') verifyCaptcha();
         }
     });
     
-    // ============================================================
-    // 17. INIT
-    // ============================================================
-    window.onload = function() {
-        autoCheckSession();
-    };
+    // ===== INIT =====
+    window.onload = autoCheckSession;
 </script>
 </body>
-                    </html>
+    </html>
