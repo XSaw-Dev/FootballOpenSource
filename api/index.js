@@ -141,7 +141,13 @@ async function wafMiddleware(req, res, next) {
       return res.status(403).json({
         error: 'WAF_BLOCKED',
         message: 'Request diblokir oleh WAF.',
-        redirect: `/api/ban-status?ip=${encodeURIComponent(ip)}&reason=WAF blocked: ${detection.pattern}`
+        banData: {
+          ip: ip,
+          reason: `WAF blocked: ${detection.pattern}`,
+          status: 'BANNED',
+          risk: 99,
+          bannedAt: new Date().toISOString()
+        }
       });
     }
   } catch (error) {
@@ -187,7 +193,7 @@ async function logIP(req, res, next) {
 app.use(logIP);
 
 // ================================================================
-// 9. BAN CHECK MIDDLEWARE (RETURN JSON, BUKAN REDIRECT)
+// 9. BAN CHECK MIDDLEWARE
 // ================================================================
 async function checkBan(req, res, next) {
   const ip = getRealIP(req);
@@ -207,11 +213,9 @@ async function checkBan(req, res, next) {
       if (banData.reason && banData.reason.includes('admin')) risk = 90;
       if (banData.reason && banData.reason.includes('WAF')) risk = 99;
       
-      // Kalo request API, kasih JSON
       if (req.path.startsWith('/api/')) {
         return res.status(403).json({
           error: 'BANNED',
-          message: 'IP Anda telah diblokir',
           banData: {
             ip: ip,
             reason: banData.reason || 'Diblokir oleh admin',
@@ -223,8 +227,6 @@ async function checkBan(req, res, next) {
         });
       }
       
-      // Kalo request HTML, kirim HTML dengan status ban
-      // Biar frontend handle sendiri via JS
       return next();
     }
   } catch (error) {
@@ -237,7 +239,7 @@ async function checkBan(req, res, next) {
 app.use(checkBan);
 
 // ================================================================
-// 10. BAN STATUS API (UNTUK FRONTEND CEK BAN)
+// 10. BAN STATUS API
 // ================================================================
 app.get('/api/ban-status', async (req, res) => {
   try {
@@ -320,7 +322,7 @@ async function checkSession(req, res, next) {
 }
 
 // ================================================================
-// 13. DEVELOPER MIDDLEWARE
+// 13. DEVELOPER MIDDLEWARE (AMAN - VALIDASI KETAT)
 // ================================================================
 async function checkDeveloper(req, res, next) {
   try {
@@ -338,13 +340,23 @@ async function checkDeveloper(req, res, next) {
     const session = JSON.parse(sessionData);
     const developer = getDeveloperData();
     
-    if (!session.isDeveloper || session.username !== developer.username) {
-      return res.status(403).json({ error: 'FORBIDDEN', message: 'Hanya untuk developer.' });
+    // VALIDASI KETAT
+    if (!session.isDeveloper) {
+      return res.status(403).json({ error: 'FORBIDDEN', message: 'Bukan developer.' });
+    }
+    
+    if (session.username !== developer.username) {
+      return res.status(403).json({ error: 'FORBIDDEN', message: 'Username developer tidak cocok.' });
+    }
+    
+    if (!session.isDeveloperLogin) {
+      return res.status(403).json({ error: 'FORBIDDEN', message: 'Harus login via halaman developer.' });
     }
     
     req.session = session;
     next();
   } catch (error) {
+    console.error('❌ Check developer error:', error.message);
     return res.status(500).json({ error: 'INTERNAL_ERROR' });
   }
 }
@@ -376,7 +388,7 @@ app.get('/api/captcha', async (req, res) => {
 });
 
 // ================================================================
-// 15. VERIFY CAPTCHA
+// 15. VERIFY CAPTCHA (AMAN - TANPA ISDEVELOPER)
 // ================================================================
 app.post('/api/verify', async (req, res) => {
   const ip = getRealIP(req);
@@ -450,8 +462,10 @@ app.post('/api/verify', async (req, res) => {
     
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2, 10);
     const timestamp = Date.now();
-    const developer = getDeveloperData();
-    const isDeveloper = telegramUsername.toLowerCase() === developer.username.toLowerCase();
+    
+    // ===== KRUSIAL: USER LEWAT CAPTCHA = USER BIASA =====
+    const isDeveloper = false;
+    
     const signature = generateSessionSignature(telegramUsername, ip, userAgent, timestamp);
     
     const sessionData = {
@@ -471,7 +485,11 @@ app.post('/api/verify', async (req, res) => {
       maxAge: CONFIG.SESSION_EXPIRY * 1000
     });
     
-    res.json({ success: true, isDeveloper: isDeveloper });
+    res.json({ 
+      success: true, 
+      message: '✅ Verifikasi berhasil!',
+      isDeveloper: false
+    });
   } catch (error) {
     console.error('❌ Verify error:', error.message);
     res.status(500).json({ error: 'Terjadi kesalahan saat verifikasi.' });
@@ -479,7 +497,7 @@ app.post('/api/verify', async (req, res) => {
 });
 
 // ================================================================
-// 16. DEVELOPER LOGIN
+// 16. DEVELOPER LOGIN (AMAN - HANYA LEWAT SINI)
 // ================================================================
 app.post('/api/developer-login', async (req, res) => {
   const ip = getRealIP(req);
@@ -495,7 +513,9 @@ app.post('/api/developer-login', async (req, res) => {
       const signature = generateSessionSignature(username, ip, userAgent, timestamp);
       
       await redis.setex(`session:${sessionId}`, CONFIG.SESSION_EXPIRY, JSON.stringify({
-        username, isDeveloper: true, isDeveloperLogin: true,
+        username: username,
+        isDeveloper: true,
+        isDeveloperLogin: true,
         ip, userAgent, timestamp, signature,
         createdAt: new Date().toISOString(),
         expiresAt: new Date(Date.now() + CONFIG.SESSION_EXPIRY * 1000).toISOString()
@@ -511,6 +531,7 @@ app.post('/api/developer-login', async (req, res) => {
       res.status(401).json({ error: 'Username atau password salah!' });
     }
   } catch (error) {
+    console.error('❌ Developer login error:', error.message);
     res.status(500).json({ error: 'Terjadi kesalahan.' });
   }
 });
@@ -717,7 +738,6 @@ app.post('/api/ban-ip', checkDeveloper, async (req, res) => {
       bannedAt: new Date().toISOString()
     };
     
-    // Kalo IP yang diban = IP sendiri, kasih response khusus
     if (ip === currentIP) {
       return res.json({
         success: true,
