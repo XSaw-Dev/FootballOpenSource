@@ -6,7 +6,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 
-// ===== IMPORT MODULES (PAKE PATH LENGKAP) =====
+// ===== IMPORT MODULES =====
 const redis = require('./modules/redis');
 const { 
   wafMiddleware, 
@@ -17,7 +17,8 @@ const {
 const {
   checkSession, checkDeveloper,
   generateCaptcha, verifyCaptcha,
-  developerLogin, checkSessionAPI, logout
+  developerLogin, checkSessionAPI, logout,
+  getRealIP
 } = require('./modules/auth');
 const {
   sendMessage, getMessages, clearMessages,
@@ -35,16 +36,6 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
-}));
 
 // ===== WAF + RATE LIMIT =====
 app.use(wafMiddleware);
@@ -85,10 +76,30 @@ app.get('/api/ping', async (req, res) => {
   }
 });
 
-// ===== ERROR HANDLING GLOBAL =====
+// ================================================================
+// 404 HANDLER - PASTIKAN JSON
+// ================================================================
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'NOT_FOUND', 
+    message: 'Endpoint tidak ditemukan.',
+    path: req.path 
+  });
+});
+
+// ================================================================
+// GLOBAL ERROR HANDLER - PASTIKAN JSON
+// ================================================================
 app.use((err, req, res, next) => {
   console.error('❌ Global error:', err.message);
-  res.status(500).json({ error: 'Terjadi kesalahan server.', message: err.message });
+  console.error('Stack:', err.stack);
+  
+  // Pastiin response JSON, bukan HTML
+  res.status(500).json({ 
+    error: 'INTERNAL_ERROR', 
+    message: 'Terjadi kesalahan server.',
+    details: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 module.exports = app;
